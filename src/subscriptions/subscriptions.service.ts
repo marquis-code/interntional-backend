@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Subscription, SubscriptionDocument } from './subscription.schema';
+import { paginateQuery, PaginationParams } from '../utils/pagination.util';
 
 @Injectable()
 export class SubscriptionsService {
@@ -13,8 +14,8 @@ export class SubscriptionsService {
     return new this.subscriptionModel(data).save();
   }
 
-  async findAll(): Promise<SubscriptionDocument[]> {
-    return this.subscriptionModel.find().sort({ price: 1 }).exec();
+  async findAll(params: PaginationParams = {}): Promise<any> {
+    return paginateQuery(this.subscriptionModel, {}, params, ['name', 'description']);
   }
 
   async findActive(): Promise<SubscriptionDocument[]> {

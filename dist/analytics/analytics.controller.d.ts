@@ -24,6 +24,12 @@ export declare class AnalyticsController {
             views: any;
         }[];
         departmentEngagement: any;
+        totalRevenue: any;
+        monthlyRevenue: any;
+        dailyRevenue: {
+            date: any;
+            amount: any;
+        }[];
     }>;
     getRecentActivity(): Promise<import("./analytics.schema").AnalyticsEventDocument[]>;
     getEngagementByDepartment(): Promise<any[]>;

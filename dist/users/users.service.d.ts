@@ -1,5 +1,6 @@
 import { Model } from 'mongoose';
 import { User, UserDocument, UserRole, Department } from './schemas/user.schema';
+import { PaginationParams, PaginatedResult } from '../utils/pagination.util';
 export declare class UsersService {
     private userModel;
     private readonly logger;
@@ -7,10 +8,10 @@ export declare class UsersService {
     findByEmail(email: string): Promise<UserDocument | null>;
     findById(id: string): Promise<UserDocument | null>;
     create(userDto: Partial<User>): Promise<UserDocument>;
-    findPendingUsers(): Promise<any[]>;
-    findApprovedUsers(): Promise<any[]>;
-    findAllUsers(): Promise<any[]>;
-    findMentors(): Promise<any[]>;
+    findPendingUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
+    findApprovedUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
+    findAllUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
+    findMentors(params?: PaginationParams): Promise<PaginatedResult<any>>;
     findByDepartment(department: string): Promise<any[]>;
     approveUser(id: string): Promise<UserDocument | null>;
     rejectUser(id: string): Promise<UserDocument | null>;

@@ -12,13 +12,17 @@ const mongoose_1 = require("@nestjs/mongoose");
 const analytics_controller_1 = require("./analytics.controller");
 const analytics_service_1 = require("./analytics.service");
 const analytics_schema_1 = require("./analytics.schema");
+const payment_schema_1 = require("../payments/payment.schema");
 let AnalyticsModule = class AnalyticsModule {
 };
 exports.AnalyticsModule = AnalyticsModule;
 exports.AnalyticsModule = AnalyticsModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: analytics_schema_1.AnalyticsEvent.name, schema: analytics_schema_1.AnalyticsEventSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: analytics_schema_1.AnalyticsEvent.name, schema: analytics_schema_1.AnalyticsEventSchema },
+                { name: payment_schema_1.Payment.name, schema: payment_schema_1.PaymentSchema },
+            ]),
         ],
         controllers: [analytics_controller_1.AnalyticsController],
         providers: [analytics_service_1.AnalyticsService],

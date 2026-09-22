@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const analytics_schema_1 = require("./analytics.schema");
+const payment_schema_1 = require("../payments/payment.schema");
 let AnalyticsService = class AnalyticsService {
     analyticsModel;
-    constructor(analyticsModel) {
+    paymentModel;
+    constructor(analyticsModel, paymentModel) {
         this.analyticsModel = analyticsModel;
+        this.paymentModel = paymentModel;
     }
     async trackEvent(data) {
         const eventDoc = new this.analyticsModel({
@@ -39,7 +42,7 @@ let AnalyticsService = class AnalyticsService {
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const [totalEvents, todayPageViews, todayLogins, weeklyDownloads, weeklyJobClicks, monthlySignups, monthlyPayments, eventBreakdown, dailyPageViews, departmentEngagement,] = await Promise.all([
+        const [totalEvents, todayPageViews, todayLogins, weeklyDownloads, weeklyJobClicks, monthlySignups, monthlyPayments, eventBreakdown, dailyPageViews, departmentEngagement, totalRevenueData, monthlyRevenueData, dailyRevenueData,] = await Promise.all([
             this.analyticsModel.countDocuments().exec(),
             this.analyticsModel.countDocuments({ event: analytics_schema_1.EventType.PAGE_VIEW, createdAt: { $gte: today } }).exec(),
             this.analyticsModel.countDocuments({ event: analytics_schema_1.EventType.LOGIN, createdAt: { $gte: today } }).exec(),
@@ -65,6 +68,22 @@ let AnalyticsService = class AnalyticsService {
                 { $group: { _id: '$department', count: { $sum: 1 } } },
                 { $sort: { count: -1 } },
             ]).exec(),
+            this.paymentModel.aggregate([
+                { $match: { status: payment_schema_1.PaymentStatus.SUCCESS } },
+                { $group: { _id: null, total: { $sum: '$amount' } } },
+            ]).exec(),
+            this.paymentModel.aggregate([
+                { $match: { status: payment_schema_1.PaymentStatus.SUCCESS, createdAt: { $gte: thirtyDaysAgo } } },
+                { $group: { _id: null, total: { $sum: '$amount' } } },
+            ]).exec(),
+            this.paymentModel.aggregate([
+                { $match: { status: payment_schema_1.PaymentStatus.SUCCESS, createdAt: { $gte: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000) } } },
+                { $group: {
+                        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                        total: { $sum: '$amount' },
+                    } },
+                { $sort: { _id: 1 } },
+            ]).exec(),
         ]);
         return {
             totalEvents,
@@ -77,6 +96,9 @@ let AnalyticsService = class AnalyticsService {
             eventBreakdown: eventBreakdown.reduce((acc, e) => { acc[e._id] = e.count; return acc; }, {}),
             dailyPageViews: dailyPageViews.map(d => ({ date: d._id, views: d.count })),
             departmentEngagement: departmentEngagement.reduce((acc, d) => { acc[d._id] = d.count; return acc; }, {}),
+            totalRevenue: totalRevenueData[0]?.total || 0,
+            monthlyRevenue: monthlyRevenueData[0]?.total || 0,
+            dailyRevenue: dailyRevenueData.map(d => ({ date: d._id, amount: d.total })),
         };
     }
     async getRecentActivity(limit = 50) {
@@ -109,6 +131,8 @@ exports.AnalyticsService = AnalyticsService;
 exports.AnalyticsService = AnalyticsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(analytics_schema_1.AnalyticsEvent.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)(payment_schema_1.Payment.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model])
 ], AnalyticsService);
 //# sourceMappingURL=analytics.service.js.map

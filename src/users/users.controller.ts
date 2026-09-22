@@ -1,10 +1,11 @@
-import { Controller, Get, Patch, Param, Body, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, UseGuards, UseInterceptors, Query } from '@nestjs/common';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles, Permissions } from '../auth/decorators';
 import { UserRole, Department } from './schemas/user.schema';
+import type { PaginationParams } from '../utils/pagination.util';
 
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -12,26 +13,24 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // GET /users/pending – list pending users (for admin dashboard)
-  @UseInterceptors(CacheInterceptor)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR)
   @Get('pending')
-  async getPending() {
-    return this.usersService.findPendingUsers();
+  async getPending(@Query() query: PaginationParams) {
+    return this.usersService.findPendingUsers(query);
   }
 
   // GET /users/approved – list approved users
-  @UseInterceptors(CacheInterceptor)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR)
   @Get('approved')
-  async getApproved() {
-    return this.usersService.findApprovedUsers();
+  async getApproved(@Query() query: PaginationParams) {
+    return this.usersService.findApprovedUsers(query);
   }
 
   // GET /users/all – list all users (for roles management page)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @Get('all')
-  async getAll() {
-    return this.usersService.findAllUsers();
+  async getAll(@Query() query: PaginationParams) {
+    return this.usersService.findAllUsers(query);
   }
 
   // GET /users/stats – aggregate user stats for analytics

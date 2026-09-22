@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { AnalyticsEvent, AnalyticsEventDocument, EventType } from './analytics.schema';
+import { Payment, PaymentDocument, PaymentStatus } from '../payments/payment.schema';
 
 @Injectable()
 export class AnalyticsService {
   constructor(
     @InjectModel(AnalyticsEvent.name) private analyticsModel: Model<AnalyticsEventDocument>,
+    @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
   ) {}
 
   async trackEvent(data: {
@@ -47,6 +49,9 @@ export class AnalyticsService {
       eventBreakdown,
       dailyPageViews,
       departmentEngagement,
+      totalRevenueData,
+      monthlyRevenueData,
+      dailyRevenueData,
     ] = await Promise.all([
       this.analyticsModel.countDocuments().exec(),
       this.analyticsModel.countDocuments({ event: EventType.PAGE_VIEW, createdAt: { $gte: today } }).exec(),
@@ -69,11 +74,27 @@ export class AnalyticsService {
         }},
         { $sort: { _id: 1 } },
       ]).exec(),
-      // Department engagement
       this.analyticsModel.aggregate([
         { $match: { department: { $ne: '' }, createdAt: { $gte: thirtyDaysAgo } } },
         { $group: { _id: '$department', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
+      ]).exec(),
+      // Revenue metrics
+      this.paymentModel.aggregate([
+        { $match: { status: PaymentStatus.SUCCESS } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]).exec(),
+      this.paymentModel.aggregate([
+        { $match: { status: PaymentStatus.SUCCESS, createdAt: { $gte: thirtyDaysAgo } } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]).exec(),
+      this.paymentModel.aggregate([
+        { $match: { status: PaymentStatus.SUCCESS, createdAt: { $gte: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000) } } },
+        { $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          total: { $sum: '$amount' },
+        }},
+        { $sort: { _id: 1 } },
       ]).exec(),
     ]);
 
@@ -88,6 +109,9 @@ export class AnalyticsService {
       eventBreakdown: eventBreakdown.reduce((acc, e) => { acc[e._id] = e.count; return acc; }, {}),
       dailyPageViews: dailyPageViews.map(d => ({ date: d._id, views: d.count })),
       departmentEngagement: departmentEngagement.reduce((acc, d) => { acc[d._id] = d.count; return acc; }, {}),
+      totalRevenue: totalRevenueData[0]?.total || 0,
+      monthlyRevenue: monthlyRevenueData[0]?.total || 0,
+      dailyRevenue: dailyRevenueData.map(d => ({ date: d._id, amount: d.total })),
     };
   }
 

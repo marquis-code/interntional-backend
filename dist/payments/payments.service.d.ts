@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Payment, PaymentDocument } from './payment.schema';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { UsersService } from '../users/users.service';
+import { PaginationParams } from '../utils/pagination.util';
 export declare class PaymentsService {
     private paymentModel;
     private configService;
@@ -32,7 +33,7 @@ export declare class PaymentsService {
         message: string;
     }>;
     private activateUserSubscription;
-    findAll(): Promise<PaymentDocument[]>;
+    findAll(params?: PaginationParams): Promise<any>;
     findByUser(userId: string): Promise<PaymentDocument[]>;
     getPaymentStats(): Promise<{
         totalRevenue: any;

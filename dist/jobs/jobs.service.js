@@ -17,13 +17,14 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const job_schema_1 = require("./schemas/job.schema");
+const pagination_util_1 = require("../utils/pagination.util");
 let JobsService = class JobsService {
     jobModel;
     constructor(jobModel) {
         this.jobModel = jobModel;
     }
-    async findAll() {
-        return this.jobModel.find().sort({ createdAt: -1 }).lean().exec();
+    async findAll(params = {}) {
+        return (0, pagination_util_1.paginateQuery)(this.jobModel, {}, params, ['title', 'company', 'location', 'type']);
     }
     async create(jobDto) {
         const newJob = new this.jobModel(jobDto);

@@ -19,6 +19,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const schedule_1 = require("@nestjs/schedule");
 const user_schema_1 = require("./schemas/user.schema");
+const pagination_util_1 = require("../utils/pagination.util");
 let UsersService = UsersService_1 = class UsersService {
     userModel;
     logger = new common_1.Logger(UsersService_1.name);
@@ -35,25 +36,29 @@ let UsersService = UsersService_1 = class UsersService {
         const newUser = new this.userModel(userDto);
         return newUser.save();
     }
-    async findPendingUsers() {
-        return this.userModel.find({ status: user_schema_1.UserStatus.PENDING }).lean().exec();
+    async findPendingUsers(params = {}) {
+        const query = { status: user_schema_1.UserStatus.PENDING };
+        return (0, pagination_util_1.paginateQuery)(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
     }
-    async findApprovedUsers() {
-        return this.userModel.find({
+    async findApprovedUsers(params = {}) {
+        const query = {
             status: user_schema_1.UserStatus.APPROVED,
             role: { $ne: user_schema_1.UserRole.SUPER_ADMIN }
-        }).select('-passwordHash').lean().exec();
+        };
+        return (0, pagination_util_1.paginateQuery)(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
     }
-    async findAllUsers() {
-        return this.userModel.find({
+    async findAllUsers(params = {}) {
+        const query = {
             role: { $ne: user_schema_1.UserRole.SUPER_ADMIN }
-        }).select('-passwordHash').lean().exec();
+        };
+        return (0, pagination_util_1.paginateQuery)(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
     }
-    async findMentors() {
-        return this.userModel.find({
+    async findMentors(params = {}) {
+        const query = {
             status: user_schema_1.UserStatus.APPROVED,
             role: user_schema_1.UserRole.ALUMNI_MEMBER
-        }).select('-passwordHash').lean().exec();
+        };
+        return (0, pagination_util_1.paginateQuery)(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
     }
     async findByDepartment(department) {
         return this.userModel.find({

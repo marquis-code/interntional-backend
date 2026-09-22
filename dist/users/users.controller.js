@@ -25,14 +25,14 @@ let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
     }
-    async getPending() {
-        return this.usersService.findPendingUsers();
+    async getPending(query) {
+        return this.usersService.findPendingUsers(query);
     }
-    async getApproved() {
-        return this.usersService.findApprovedUsers();
+    async getApproved(query) {
+        return this.usersService.findApprovedUsers(query);
     }
-    async getAll() {
-        return this.usersService.findAllUsers();
+    async getAll(query) {
+        return this.usersService.findAllUsers(query);
     }
     async getStats() {
         return this.usersService.getStats();
@@ -64,26 +64,27 @@ let UsersController = class UsersController {
 };
 exports.UsersController = UsersController;
 __decorate([
-    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
     (0, decorators_1.Roles)(user_schema_1.UserRole.SUPER_ADMIN, user_schema_1.UserRole.ADMIN, user_schema_1.UserRole.MODERATOR),
     (0, common_1.Get)('pending'),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getPending", null);
 __decorate([
-    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
     (0, decorators_1.Roles)(user_schema_1.UserRole.SUPER_ADMIN, user_schema_1.UserRole.ADMIN, user_schema_1.UserRole.MODERATOR),
     (0, common_1.Get)('approved'),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getApproved", null);
 __decorate([
     (0, decorators_1.Roles)(user_schema_1.UserRole.SUPER_ADMIN, user_schema_1.UserRole.ADMIN),
     (0, common_1.Get)('all'),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getAll", null);
 __decorate([

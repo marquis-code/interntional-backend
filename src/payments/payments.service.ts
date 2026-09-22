@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Payment, PaymentDocument, PaymentStatus } from './payment.schema';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { UsersService } from '../users/users.service';
+import { paginateQuery, PaginationParams } from '../utils/pagination.util';
 
 @Injectable()
 export class PaymentsService {
@@ -174,13 +175,14 @@ export class PaymentsService {
   /**
    * Get all payments (admin)
    */
-  async findAll(): Promise<PaymentDocument[]> {
-    return this.paymentModel
-      .find()
-      .populate('userId', 'firstName lastName email')
-      .populate('subscriptionId', 'name price durationMonths')
-      .sort({ createdAt: -1 })
-      .exec();
+  async findAll(params: PaginationParams = {}): Promise<any> {
+    return paginateQuery(
+      this.paymentModel,
+      {},
+      params,
+      ['reference', 'status'], // fields to search on
+      [{ path: 'userId', select: 'firstName lastName email' }, { path: 'subscriptionId', select: 'name price durationMonths' }]
+    );
   }
 
   /**

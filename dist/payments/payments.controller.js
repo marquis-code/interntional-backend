@@ -79,8 +79,8 @@ let PaymentsController = class PaymentsController {
         }
         return this.paymentsService.handleWebhook(body);
     }
-    async findAll() {
-        return this.paymentsService.findAll();
+    async findAll(query) {
+        return this.paymentsService.findAll(query);
     }
     async getStats() {
         return this.paymentsService.getPaymentStats();
@@ -120,8 +120,9 @@ __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, decorators_1.Roles)(user_schema_1.UserRole.SUPER_ADMIN, user_schema_1.UserRole.ADMIN),
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PaymentsController.prototype, "findAll", null);
 __decorate([

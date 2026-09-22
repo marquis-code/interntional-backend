@@ -1,8 +1,10 @@
 import { Model } from 'mongoose';
 import { AnalyticsEventDocument, EventType } from './analytics.schema';
+import { PaymentDocument } from '../payments/payment.schema';
 export declare class AnalyticsService {
     private analyticsModel;
-    constructor(analyticsModel: Model<AnalyticsEventDocument>);
+    private paymentModel;
+    constructor(analyticsModel: Model<AnalyticsEventDocument>, paymentModel: Model<PaymentDocument>);
     trackEvent(data: {
         event: EventType;
         userId?: string;
@@ -26,6 +28,12 @@ export declare class AnalyticsService {
             views: any;
         }[];
         departmentEngagement: any;
+        totalRevenue: any;
+        monthlyRevenue: any;
+        dailyRevenue: {
+            date: any;
+            amount: any;
+        }[];
     }>;
     getRecentActivity(limit?: number): Promise<AnalyticsEventDocument[]>;
     getEngagementByDepartment(): Promise<any[]>;

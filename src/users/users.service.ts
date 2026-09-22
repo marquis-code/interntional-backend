@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { User, UserDocument, UserStatus, UserRole, Department, Permission } from './schemas/user.schema';
+import { paginateQuery, PaginationParams, PaginatedResult } from '../utils/pagination.util';
 
 @Injectable()
 export class UsersService {
@@ -23,28 +24,32 @@ export class UsersService {
     return newUser.save();
   }
 
-  async findPendingUsers(): Promise<any[]> {
-    return this.userModel.find({ status: UserStatus.PENDING }).lean().exec();
+  async findPendingUsers(params: PaginationParams = {}): Promise<PaginatedResult<any>> {
+    const query = { status: UserStatus.PENDING };
+    return paginateQuery(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
   }
 
-  async findApprovedUsers(): Promise<any[]> {
-    return this.userModel.find({ 
+  async findApprovedUsers(params: PaginationParams = {}): Promise<PaginatedResult<any>> {
+    const query = { 
       status: UserStatus.APPROVED,
       role: { $ne: UserRole.SUPER_ADMIN } 
-    }).select('-passwordHash').lean().exec();
+    };
+    return paginateQuery(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
   }
 
-  async findAllUsers(): Promise<any[]> {
-    return this.userModel.find({ 
+  async findAllUsers(params: PaginationParams = {}): Promise<PaginatedResult<any>> {
+    const query = { 
       role: { $ne: UserRole.SUPER_ADMIN } 
-    }).select('-passwordHash').lean().exec();
+    };
+    return paginateQuery(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
   }
 
-  async findMentors(): Promise<any[]> {
-    return this.userModel.find({ 
+  async findMentors(params: PaginationParams = {}): Promise<PaginatedResult<any>> {
+    const query = { 
       status: UserStatus.APPROVED,
       role: UserRole.ALUMNI_MEMBER 
-    }).select('-passwordHash').lean().exec();
+    };
+    return paginateQuery(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');
   }
 
   async findByDepartment(department: string): Promise<any[]> {

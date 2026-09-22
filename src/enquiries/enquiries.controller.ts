@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, UseGuards, Query } from '@nestjs/common';
 import { EnquiriesService } from './enquiries.service';
 import { AuthGuard } from '@nestjs/passport';
+import type { PaginationParams } from '../utils/pagination.util';
 
 @Controller('enquiries')
 export class EnquiriesController {
@@ -13,8 +14,8 @@ export class EnquiriesController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll() {
-    return this.enquiriesService.findAll();
+  async findAll(@Query() query: PaginationParams) {
+    return this.enquiriesService.findAll(query);
   }
 
   @UseGuards(AuthGuard('jwt'))

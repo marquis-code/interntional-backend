@@ -1,4 +1,5 @@
 import { PaymentsService } from './payments.service';
+import type { PaginationParams } from '../utils/pagination.util';
 import { ConfigService } from '@nestjs/config';
 export declare class PaymentsController {
     private readonly paymentsService;
@@ -26,7 +27,7 @@ export declare class PaymentsController {
     webhook(body: any, signature: string): Promise<{
         message: string;
     }>;
-    findAll(): Promise<import("./payment.schema").PaymentDocument[]>;
+    findAll(query: PaginationParams): Promise<any>;
     getStats(): Promise<{
         totalRevenue: any;
         monthlyRevenue: any;

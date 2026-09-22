@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { AuthGuard } from '@nestjs/passport';
+import type { PaginationParams } from '../utils/pagination.util';
 
 @Controller('subscriptions')
 export class SubscriptionsController {
@@ -15,8 +16,8 @@ export class SubscriptionsController {
   // Admin: get all plans including inactive
   @UseGuards(AuthGuard('jwt'))
   @Get('all')
-  async findAll() {
-    return this.subscriptionsService.findAll();
+  async findAll(@Query() query: PaginationParams) {
+    return this.subscriptionsService.findAll(query);
   }
 
   // Admin: create plan

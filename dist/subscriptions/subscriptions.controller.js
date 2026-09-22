@@ -24,8 +24,8 @@ let SubscriptionsController = class SubscriptionsController {
     async findActive() {
         return this.subscriptionsService.findActive();
     }
-    async findAll() {
-        return this.subscriptionsService.findAll();
+    async findAll(query) {
+        return this.subscriptionsService.findAll(query);
     }
     async create(body) {
         return this.subscriptionsService.create(body);
@@ -47,8 +47,9 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Get)('all'),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], SubscriptionsController.prototype, "findAll", null);
 __decorate([

@@ -14,7 +14,6 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobsController = void 0;
 const common_1 = require("@nestjs/common");
-const cache_manager_1 = require("@nestjs/cache-manager");
 const passport_1 = require("@nestjs/passport");
 const jobs_service_1 = require("./jobs.service");
 let JobsController = class JobsController {
@@ -22,8 +21,8 @@ let JobsController = class JobsController {
     constructor(jobsService) {
         this.jobsService = jobsService;
     }
-    async findAll() {
-        return this.jobsService.findAll();
+    async findAll(query) {
+        return this.jobsService.findAll(query);
     }
     async create(body) {
         return this.jobsService.create(body);
@@ -35,10 +34,10 @@ let JobsController = class JobsController {
 };
 exports.JobsController = JobsController;
 __decorate([
-    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "findAll", null);
 __decorate([

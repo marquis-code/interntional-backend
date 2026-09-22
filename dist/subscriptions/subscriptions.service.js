@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const subscription_schema_1 = require("./subscription.schema");
+const pagination_util_1 = require("../utils/pagination.util");
 let SubscriptionsService = class SubscriptionsService {
     subscriptionModel;
     constructor(subscriptionModel) {
@@ -25,8 +26,8 @@ let SubscriptionsService = class SubscriptionsService {
     async create(data) {
         return new this.subscriptionModel(data).save();
     }
-    async findAll() {
-        return this.subscriptionModel.find().sort({ price: 1 }).exec();
+    async findAll(params = {}) {
+        return (0, pagination_util_1.paginateQuery)(this.subscriptionModel, {}, params, ['name', 'description']);
     }
     async findActive() {
         return this.subscriptionModel.find({ isActive: true }).sort({ price: 1 }).exec();

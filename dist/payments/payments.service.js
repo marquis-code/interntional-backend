@@ -24,6 +24,7 @@ const axios_1 = __importDefault(require("axios"));
 const payment_schema_1 = require("./payment.schema");
 const subscriptions_service_1 = require("../subscriptions/subscriptions.service");
 const users_service_1 = require("../users/users.service");
+const pagination_util_1 = require("../utils/pagination.util");
 let PaymentsService = class PaymentsService {
     paymentModel;
     configService;
@@ -141,13 +142,8 @@ let PaymentsService = class PaymentsService {
             console.error('Failed to activate subscription for user:', userId, error);
         }
     }
-    async findAll() {
-        return this.paymentModel
-            .find()
-            .populate('userId', 'firstName lastName email')
-            .populate('subscriptionId', 'name price durationMonths')
-            .sort({ createdAt: -1 })
-            .exec();
+    async findAll(params = {}) {
+        return (0, pagination_util_1.paginateQuery)(this.paymentModel, {}, params, ['reference', 'status'], [{ path: 'userId', select: 'firstName lastName email' }, { path: 'subscriptionId', select: 'name price durationMonths' }]);
     }
     async findByUser(userId) {
         return this.paymentModel

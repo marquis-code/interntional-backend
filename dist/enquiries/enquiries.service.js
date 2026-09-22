@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const enquiry_schema_1 = require("./enquiry.schema");
+const pagination_util_1 = require("../utils/pagination.util");
 let EnquiriesService = class EnquiriesService {
     enquiryModel;
     constructor(enquiryModel) {
@@ -26,8 +27,8 @@ let EnquiriesService = class EnquiriesService {
         const createdEnquiry = new this.enquiryModel(createDto);
         return createdEnquiry.save();
     }
-    async findAll() {
-        return this.enquiryModel.find().sort({ createdAt: -1 }).exec();
+    async findAll(params = {}) {
+        return (0, pagination_util_1.paginateQuery)(this.enquiryModel, {}, params, ['name', 'email', 'message', 'status']);
     }
     async markAsRead(id) {
         return this.enquiryModel.findByIdAndUpdate(id, { status: 'read' }, { new: true }).exec();

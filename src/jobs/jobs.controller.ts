@@ -1,18 +1,17 @@
-import { Controller, Get, Post, Delete, Param, Body, UseGuards, UseInterceptors } from '@nestjs/common';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JobsService } from './jobs.service';
 import { Job } from './schemas/job.schema';
+import type { PaginationParams } from '../utils/pagination.util';
 
 @Controller('jobs')
 @UseGuards(AuthGuard('jwt'))
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
-  @UseInterceptors(CacheInterceptor)
   @Get()
-  async findAll() {
-    return this.jobsService.findAll();
+  async findAll(@Query() query: PaginationParams) {
+    return this.jobsService.findAll(query);
   }
 
   @Post()

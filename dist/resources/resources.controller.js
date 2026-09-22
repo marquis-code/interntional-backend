@@ -14,12 +14,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResourcesController = void 0;
 const common_1 = require("@nestjs/common");
-const cache_manager_1 = require("@nestjs/cache-manager");
 const passport_1 = require("@nestjs/passport");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const resource_schema_1 = require("./schemas/resource.schema");
 const storage_service_1 = require("../storage/storage.service");
+const pagination_util_1 = require("../utils/pagination.util");
 let ResourcesController = class ResourcesController {
     resourceModel;
     storageService;
@@ -27,9 +27,12 @@ let ResourcesController = class ResourcesController {
         this.resourceModel = resourceModel;
         this.storageService = storageService;
     }
-    async findAll(category) {
-        const filter = category && category !== 'All' ? { category } : {};
-        return this.resourceModel.find(filter).sort({ createdAt: -1 }).lean().exec();
+    async findAll(queryParams) {
+        const query = {};
+        if (queryParams.category && queryParams.category !== 'All') {
+            query.category = queryParams.category;
+        }
+        return (0, pagination_util_1.paginateQuery)(this.resourceModel, query, queryParams, ['title', 'description', 'category', 'fileType']);
     }
     async getSignedUrl(id) {
         const resource = await this.resourceModel.findById(id).exec();
@@ -51,11 +54,10 @@ let ResourcesController = class ResourcesController {
 };
 exports.ResourcesController = ResourcesController;
 __decorate([
-    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('category')),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ResourcesController.prototype, "findAll", null);
 __decorate([

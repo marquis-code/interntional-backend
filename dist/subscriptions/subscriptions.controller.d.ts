@@ -1,9 +1,10 @@
 import { SubscriptionsService } from './subscriptions.service';
+import type { PaginationParams } from '../utils/pagination.util';
 export declare class SubscriptionsController {
     private readonly subscriptionsService;
     constructor(subscriptionsService: SubscriptionsService);
     findActive(): Promise<import("./subscription.schema").SubscriptionDocument[]>;
-    findAll(): Promise<import("./subscription.schema").SubscriptionDocument[]>;
+    findAll(query: PaginationParams): Promise<any>;
     create(body: {
         name: string;
         description: string;

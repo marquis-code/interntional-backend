@@ -16,6 +16,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Resource, ResourceDocument } from './schemas/resource.schema';
 import { StorageService } from '../storage/storage.service';
+import { paginateQuery, PaginationParams } from '../utils/pagination.util';
 
 @Controller('resources')
 @UseGuards(AuthGuard('jwt'))
@@ -26,11 +27,13 @@ export class ResourcesController {
   ) {}
 
   // GET /resources – list all resources (Interns & Alumni)
-  @UseInterceptors(CacheInterceptor)
   @Get()
-  async findAll(@Query('category') category?: string) {
-    const filter = category && category !== 'All' ? { category } : {};
-    return this.resourceModel.find(filter).sort({ createdAt: -1 }).lean().exec();
+  async findAll(@Query() queryParams: PaginationParams & { category?: string }) {
+    const query: any = {};
+    if (queryParams.category && queryParams.category !== 'All') {
+      query.category = queryParams.category;
+    }
+    return paginateQuery(this.resourceModel, query, queryParams, ['title', 'description', 'category', 'fileType']);
   }
 
   // GET /resources/:id/url – get the Cloudinary url (no longer presigned, just returns the secure_url)

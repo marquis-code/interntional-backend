@@ -24,8 +24,8 @@ let EnquiriesController = class EnquiriesController {
     async create(createDto) {
         return this.enquiriesService.create(createDto);
     }
-    async findAll() {
-        return this.enquiriesService.findAll();
+    async findAll(query) {
+        return this.enquiriesService.findAll(query);
     }
     async markAsRead(id) {
         return this.enquiriesService.markAsRead(id);
@@ -42,8 +42,9 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], EnquiriesController.prototype, "findAll", null);
 __decorate([

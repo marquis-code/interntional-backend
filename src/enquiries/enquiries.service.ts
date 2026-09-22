@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Enquiry } from './enquiry.schema';
+import { paginateQuery, PaginationParams } from '../utils/pagination.util';
 
 @Injectable()
 export class EnquiriesService {
@@ -12,8 +13,13 @@ export class EnquiriesService {
     return createdEnquiry.save();
   }
 
-  async findAll() {
-    return this.enquiryModel.find().sort({ createdAt: -1 }).exec();
+  async findAll(params: PaginationParams = {}) {
+    return paginateQuery(
+      this.enquiryModel,
+      {},
+      params,
+      ['name', 'email', 'message', 'status']
+    );
   }
 
   async markAsRead(id: string) {

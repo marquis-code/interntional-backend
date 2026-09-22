@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req, Headers, RawBodyRequest } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req, Headers, RawBodyRequest, Query } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/decorators';
 import { UserRole } from '../users/schemas/user.schema';
+import type { PaginationParams } from '../utils/pagination.util';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 
@@ -66,8 +67,8 @@ export class PaymentsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @Get()
-  async findAll() {
-    return this.paymentsService.findAll();
+  async findAll(@Query() query: PaginationParams) {
+    return this.paymentsService.findAll(query);
   }
 
   /**
