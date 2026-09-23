@@ -14,7 +14,7 @@ export declare class AnalyticsService {
         userAgent?: string;
         department?: string;
     }): Promise<AnalyticsEventDocument>;
-    getDashboardStats(): Promise<{
+    getDashboardStats(startDateStr?: string, endDateStr?: string): Promise<{
         totalEvents: number;
         todayPageViews: number;
         todayLogins: number;

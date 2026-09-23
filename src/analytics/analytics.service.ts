@@ -32,11 +32,35 @@ export class AnalyticsService {
     return eventDoc.save();
   }
 
-  async getDashboardStats() {
+  async getDashboardStats(startDateStr?: string, endDateStr?: string) {
     const now = new Date();
+    
+    // Default dates
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+    let isCustom = false;
+    let customStart = thirtyDaysAgo;
+    let customEnd = now;
+
+    if (startDateStr && endDateStr) {
+        const s = new Date(startDateStr);
+        const e = new Date(endDateStr);
+        if (!isNaN(s.getTime()) && !isNaN(e.getTime())) {
+            isCustom = true;
+            customStart = s;
+            customEnd = e;
+        }
+    }
+
+    const getMatch = (defaultDate: Date, extra: any = {}) => {
+        if (isCustom) {
+            return { createdAt: { $gte: customStart, $lte: customEnd }, ...extra };
+        }
+        return { createdAt: { $gte: defaultDate }, ...extra };
+    };
 
     const [
       totalEvents,
@@ -53,21 +77,21 @@ export class AnalyticsService {
       monthlyRevenueData,
       dailyRevenueData,
     ] = await Promise.all([
-      this.analyticsModel.countDocuments().exec(),
-      this.analyticsModel.countDocuments({ event: EventType.PAGE_VIEW, createdAt: { $gte: today } }).exec(),
-      this.analyticsModel.countDocuments({ event: EventType.LOGIN, createdAt: { $gte: today } }).exec(),
-      this.analyticsModel.countDocuments({ event: EventType.DOWNLOAD, createdAt: { $gte: sevenDaysAgo } }).exec(),
-      this.analyticsModel.countDocuments({ event: EventType.JOB_CLICK, createdAt: { $gte: sevenDaysAgo } }).exec(),
-      this.analyticsModel.countDocuments({ event: EventType.SIGNUP, createdAt: { $gte: thirtyDaysAgo } }).exec(),
-      this.analyticsModel.countDocuments({ event: EventType.PAYMENT_SUCCESS, createdAt: { $gte: thirtyDaysAgo } }).exec(),
+      this.analyticsModel.countDocuments(isCustom ? { createdAt: { $gte: customStart, $lte: customEnd } } : {}).exec(),
+      this.analyticsModel.countDocuments(getMatch(today, { event: EventType.PAGE_VIEW })).exec(),
+      this.analyticsModel.countDocuments(getMatch(today, { event: EventType.LOGIN })).exec(),
+      this.analyticsModel.countDocuments(getMatch(sevenDaysAgo, { event: EventType.DOWNLOAD })).exec(),
+      this.analyticsModel.countDocuments(getMatch(sevenDaysAgo, { event: EventType.JOB_CLICK })).exec(),
+      this.analyticsModel.countDocuments(getMatch(thirtyDaysAgo, { event: EventType.SIGNUP })).exec(),
+      this.analyticsModel.countDocuments(getMatch(thirtyDaysAgo, { event: EventType.PAYMENT_SUCCESS })).exec(),
       this.analyticsModel.aggregate([
-        { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+        { $match: getMatch(thirtyDaysAgo) },
         { $group: { _id: '$event', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]).exec(),
-      // Daily page views for last 14 days
+      // Daily page views
       this.analyticsModel.aggregate([
-        { $match: { event: EventType.PAGE_VIEW, createdAt: { $gte: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000) } } },
+        { $match: getMatch(fourteenDaysAgo, { event: EventType.PAGE_VIEW }) },
         { $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
           count: { $sum: 1 },
@@ -75,21 +99,21 @@ export class AnalyticsService {
         { $sort: { _id: 1 } },
       ]).exec(),
       this.analyticsModel.aggregate([
-        { $match: { department: { $ne: '' }, createdAt: { $gte: thirtyDaysAgo } } },
+        { $match: getMatch(thirtyDaysAgo, { department: { $ne: '' } }) },
         { $group: { _id: '$department', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]).exec(),
       // Revenue metrics
       this.paymentModel.aggregate([
-        { $match: { status: PaymentStatus.SUCCESS } },
+        { $match: isCustom ? { status: PaymentStatus.SUCCESS, createdAt: { $gte: customStart, $lte: customEnd } } : { status: PaymentStatus.SUCCESS } },
         { $group: { _id: null, total: { $sum: '$amount' } } },
       ]).exec(),
       this.paymentModel.aggregate([
-        { $match: { status: PaymentStatus.SUCCESS, createdAt: { $gte: thirtyDaysAgo } } },
+        { $match: getMatch(thirtyDaysAgo, { status: PaymentStatus.SUCCESS }) },
         { $group: { _id: null, total: { $sum: '$amount' } } },
       ]).exec(),
       this.paymentModel.aggregate([
-        { $match: { status: PaymentStatus.SUCCESS, createdAt: { $gte: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000) } } },
+        { $match: getMatch(fourteenDaysAgo, { status: PaymentStatus.SUCCESS }) },
         { $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
           total: { $sum: '$amount' },

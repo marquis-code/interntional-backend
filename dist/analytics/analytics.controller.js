@@ -31,8 +31,8 @@ let AnalyticsController = class AnalyticsController {
             userAgent: req.headers['user-agent'] || '',
         });
     }
-    async getDashboardStats() {
-        return this.analyticsService.getDashboardStats();
+    async getDashboardStats(startDate, endDate) {
+        return this.analyticsService.getDashboardStats(startDate, endDate);
     }
     async getRecentActivity() {
         return this.analyticsService.getRecentActivity();
@@ -54,8 +54,10 @@ __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, decorators_1.Roles)(user_schema_1.UserRole.SUPER_ADMIN, user_schema_1.UserRole.ADMIN),
     (0, common_1.Get)('dashboard'),
+    __param(0, (0, common_1.Query)('startDate')),
+    __param(1, (0, common_1.Query)('endDate')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], AnalyticsController.prototype, "getDashboardStats", null);
 __decorate([

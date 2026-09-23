@@ -10,7 +10,7 @@ export declare class AnalyticsController {
         metadata?: Record<string, any>;
         department?: string;
     }, req: any): Promise<import("./analytics.schema").AnalyticsEventDocument>;
-    getDashboardStats(): Promise<{
+    getDashboardStats(startDate?: string, endDate?: string): Promise<{
         totalEvents: number;
         todayPageViews: number;
         todayLogins: number;
