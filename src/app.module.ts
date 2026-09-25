@@ -14,6 +14,10 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { UniverseModule } from './universe/universe.module';
+import { EventsModule } from './events/events.module';
+import { ArticlesModule } from './articles/articles.module';
+import { FormsModule } from './forms/forms.module';
 
 @Module({
   imports: [
@@ -36,6 +40,10 @@ import { CacheModule } from '@nestjs/cache-manager';
     SubscriptionsModule,
     PaymentsModule,
     AnalyticsModule,
+    UniverseModule,
+    EventsModule,
+    ArticlesModule,
+    FormsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

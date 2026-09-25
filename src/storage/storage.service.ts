@@ -17,8 +17,9 @@ export class StorageService {
    */
   generateUploadSignature(folder: string) {
     const timestamp = Math.round(new Date().getTime() / 1000);
+    const eager = 'q_auto,f_auto,c_limit,w_1920'; // Aggressive optimization
     const signature = cloudinary.utils.api_sign_request(
-      { timestamp, folder },
+      { timestamp, folder, eager },
       this.configService.get<string>('CLOUDINARY_API_SECRET') || 'mock-secret'
     );
 
@@ -26,6 +27,7 @@ export class StorageService {
       timestamp,
       signature,
       folder,
+      eager,
       cloudName: this.configService.get<string>('CLOUDINARY_CLOUD_NAME') || 'mock-cloud',
       apiKey: this.configService.get<string>('CLOUDINARY_API_KEY') || 'mock-key',
     };

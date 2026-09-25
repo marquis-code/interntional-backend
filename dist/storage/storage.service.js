@@ -25,11 +25,13 @@ let StorageService = class StorageService {
     }
     generateUploadSignature(folder) {
         const timestamp = Math.round(new Date().getTime() / 1000);
-        const signature = cloudinary_1.v2.utils.api_sign_request({ timestamp, folder }, this.configService.get('CLOUDINARY_API_SECRET') || 'mock-secret');
+        const eager = 'q_auto,f_auto,c_limit,w_1920';
+        const signature = cloudinary_1.v2.utils.api_sign_request({ timestamp, folder, eager }, this.configService.get('CLOUDINARY_API_SECRET') || 'mock-secret');
         return {
             timestamp,
             signature,
             folder,
+            eager,
             cloudName: this.configService.get('CLOUDINARY_CLOUD_NAME') || 'mock-cloud',
             apiKey: this.configService.get('CLOUDINARY_API_KEY') || 'mock-key',
         };

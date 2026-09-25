@@ -25,6 +25,9 @@ let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
     }
+    async getMyDashboardStats(req) {
+        return this.usersService.getUserDashboardStats(req.user.userId);
+    }
     async getPending(query) {
         return this.usersService.findPendingUsers(query);
     }
@@ -63,6 +66,13 @@ let UsersController = class UsersController {
     }
 };
 exports.UsersController = UsersController;
+__decorate([
+    (0, common_1.Get)('me/dashboard-stats'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getMyDashboardStats", null);
 __decorate([
     (0, decorators_1.Roles)(user_schema_1.UserRole.SUPER_ADMIN, user_schema_1.UserRole.ADMIN, user_schema_1.UserRole.MODERATOR),
     (0, common_1.Get)('pending'),

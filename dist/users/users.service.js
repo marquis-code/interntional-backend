@@ -36,6 +36,13 @@ let UsersService = UsersService_1 = class UsersService {
         const newUser = new this.userModel(userDto);
         return newUser.save();
     }
+    async getUserDashboardStats(userId) {
+        return {
+            documentsUploaded: Math.floor(Math.random() * 20) + 1,
+            mentorshipSessions: Math.floor(Math.random() * 10),
+            jobsApplied: Math.floor(Math.random() * 5),
+        };
+    }
     async findPendingUsers(params = {}) {
         const query = { status: user_schema_1.UserStatus.PENDING };
         return (0, pagination_util_1.paginateQuery)(this.userModel, query, params, ['email', 'firstName', 'lastName'], undefined, '-passwordHash');

@@ -6,6 +6,7 @@ export declare class StorageService {
         timestamp: number;
         signature: string;
         folder: string;
+        eager: string;
         cloudName: string;
         apiKey: string;
     };

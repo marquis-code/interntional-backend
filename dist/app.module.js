@@ -23,6 +23,10 @@ const subscriptions_module_1 = require("./subscriptions/subscriptions.module");
 const payments_module_1 = require("./payments/payments.module");
 const analytics_module_1 = require("./analytics/analytics.module");
 const cache_manager_1 = require("@nestjs/cache-manager");
+const universe_module_1 = require("./universe/universe.module");
+const events_module_1 = require("./events/events.module");
+const articles_module_1 = require("./articles/articles.module");
+const forms_module_1 = require("./forms/forms.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,6 +52,10 @@ exports.AppModule = AppModule = __decorate([
             subscriptions_module_1.SubscriptionsModule,
             payments_module_1.PaymentsModule,
             analytics_module_1.AnalyticsModule,
+            universe_module_1.UniverseModule,
+            events_module_1.EventsModule,
+            articles_module_1.ArticlesModule,
+            forms_module_1.FormsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Body, UseGuards, UseInterceptors, Query } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, UseGuards, UseInterceptors, Query, Request } from '@nestjs/common';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
@@ -11,6 +11,11 @@ import type { PaginationParams } from '../utils/pagination.util';
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('me/dashboard-stats')
+  async getMyDashboardStats(@Request() req: any) {
+    return this.usersService.getUserDashboardStats(req.user.userId);
+  }
 
   // GET /users/pending – list pending users (for admin dashboard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR)

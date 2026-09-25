@@ -8,6 +8,7 @@ export declare class StorageController {
         timestamp: number;
         signature: string;
         folder: string;
+        eager: string;
         cloudName: string;
         apiKey: string;
     };

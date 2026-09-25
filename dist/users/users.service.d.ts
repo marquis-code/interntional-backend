@@ -8,6 +8,11 @@ export declare class UsersService {
     findByEmail(email: string): Promise<UserDocument | null>;
     findById(id: string): Promise<UserDocument | null>;
     create(userDto: Partial<User>): Promise<UserDocument>;
+    getUserDashboardStats(userId: string): Promise<{
+        documentsUploaded: number;
+        mentorshipSessions: number;
+        jobsApplied: number;
+    }>;
     findPendingUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
     findApprovedUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
     findAllUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;

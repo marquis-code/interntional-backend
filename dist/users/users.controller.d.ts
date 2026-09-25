@@ -4,6 +4,11 @@ import type { PaginationParams } from '../utils/pagination.util';
 export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
+    getMyDashboardStats(req: any): Promise<{
+        documentsUploaded: number;
+        mentorshipSessions: number;
+        jobsApplied: number;
+    }>;
     getPending(query: PaginationParams): Promise<import("../utils/pagination.util").PaginatedResult<any>>;
     getApproved(query: PaginationParams): Promise<import("../utils/pagination.util").PaginatedResult<any>>;
     getAll(query: PaginationParams): Promise<import("../utils/pagination.util").PaginatedResult<any>>;
