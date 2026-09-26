@@ -84,4 +84,10 @@ export class AuthService {
       },
     };
   }
+
+  async getProfile(userId: string) {
+    const user = await this.usersService.findByIdWithSubscription(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+    return user;
+  }
 }

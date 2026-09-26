@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Event, EventDocument, EventRegistration, EventRegistrationDocument } from './events.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectModel(Event.name) private eventModel: Model<EventDocument>,
     @InjectModel(EventRegistration.name) private registrationModel: Model<EventRegistrationDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   // ---- Events CRUD ----
@@ -25,6 +27,12 @@ export class EventsService {
     const event = await this.eventModel.findById(eventId).exec();
     if (!event) throw new Error('Event not found');
     if (!event.registrationOpen) throw new Error('Registration is closed');
+    
+    if (event.isMembersOnly) {
+      const user = await this.userModel.findOne({ email: data.email }).exec();
+      if (!user) throw new Error('This event is restricted to members only.');
+      if (!user.isSubscriptionActive) throw new Error('An active premium subscription is required to register for this event.');
+    }
     
     // Check capacity
     if (event.capacity > 0) {

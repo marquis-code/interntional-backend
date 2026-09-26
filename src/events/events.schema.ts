@@ -70,6 +70,25 @@ export class Event {
 
   @Prop({ default: true })
   registrationOpen: boolean;
+
+  // Robust Event Fields
+  @Prop({ default: 0 })
+  price: number; // 0 for free
+
+  @Prop({ default: false })
+  isMembersOnly: boolean; // True if requires an active subscription
+
+  @Prop({ type: [String], default: [] })
+  tags: string[];
+
+  @Prop({ type: [{ time: String, title: String, speaker: String }], default: [] })
+  agenda: { time: string; title: string; speaker: string }[];
+
+  @Prop({ type: [{ name: String, url: String }], default: [] })
+  attachments: { name: string; url: string }[];
+
+  @Prop({ type: [{ name: String, logo: String, website: String }], default: [] })
+  sponsors: { name: string; logo: string; website: string }[];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

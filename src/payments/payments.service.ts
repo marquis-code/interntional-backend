@@ -165,7 +165,7 @@ export class PaymentsService {
   private async activateUserSubscription(userId: string, subscriptionId: string) {
     try {
       const plan = await this.subscriptionsService.findById(subscriptionId);
-      await this.usersService.activateSubscription(userId, plan.durationMonths);
+      await this.usersService.activateSubscription(userId, subscriptionId, plan.durationMonths);
     } catch (error) {
       // Log but don't throw — payment was already successful
       console.error('Failed to activate subscription for user:', userId, error);

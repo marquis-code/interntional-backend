@@ -20,6 +20,22 @@ export class Subscription {
   @Prop({ type: [String], default: [] })
   features: string[];
 
+  // Robust Access Controls
+  @Prop({ default: 0 })
+  maxMentorshipRequests: number;
+
+  @Prop({ default: false })
+  canAccessVault: boolean;
+
+  @Prop({ default: false })
+  canPostArticles: boolean;
+
+  @Prop({ default: false })
+  canAccessGlobalCommunity: boolean;
+
+  @Prop({ default: 0 })
+  eventDiscountPercentage: number;
+
   @Prop({ default: true })
   isActive: boolean;
 }

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -82,6 +82,9 @@ export class User {
 
   @Prop({ default: false })
   isSubscriptionActive: boolean;
+
+  @Prop({ type: Types.ObjectId, ref: 'Subscription', default: null })
+  activeSubscription: Types.ObjectId;
 
   @Prop({ default: null })
   lastLoginAt: Date;

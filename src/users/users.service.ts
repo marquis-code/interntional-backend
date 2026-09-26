@@ -24,6 +24,10 @@ export class UsersService {
     return this.userModel.findById(id).exec();
   }
 
+  async findByIdWithSubscription(id: string): Promise<UserDocument | null> {
+    return this.userModel.findById(id).populate('activeSubscription').select('-passwordHash').exec();
+  }
+
   async findBySetupToken(token: string): Promise<UserDocument | null> {
     return this.userModel.findOne({
       setupPasswordToken: token,
@@ -163,7 +167,7 @@ export class UsersService {
     }).exec();
   }
 
-  async activateSubscription(userId: string, durationMonths: number): Promise<UserDocument> {
+  async activateSubscription(userId: string, subscriptionId: string, durationMonths: number): Promise<UserDocument> {
     const now = new Date();
     const endDate = new Date(now);
     endDate.setMonth(endDate.getMonth() + durationMonths);
@@ -171,6 +175,7 @@ export class UsersService {
     const user = await this.userModel.findByIdAndUpdate(userId, {
       $set: {
         isSubscriptionActive: true,
+        activeSubscription: subscriptionId,
         subscriptionStartDate: now,
         subscriptionEndDate: endDate,
       },

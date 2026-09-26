@@ -23,14 +23,15 @@ export class SubscriptionsController {
   // Admin: create plan
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  async create(@Body() body: { name: string; description: string; price: number; durationMonths: number; features: string[] }) {
+  async create(@Body() body: any) {
+    // In production, validate with class-validator. 
     return this.subscriptionsService.create(body);
   }
 
   // Admin: update plan
   @UseGuards(AuthGuard('jwt'))
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: Partial<{ name: string; description: string; price: number; durationMonths: number; features: string[]; isActive: boolean }>) {
+  async update(@Param('id') id: string, @Body() body: any) {
     return this.subscriptionsService.update(id, body);
   }
 
