@@ -56,7 +56,7 @@ const seed = async () => {
   const article = generateAdvancedArticle();
   
   try {
-    const res = await axios.post('http://localhost:4000/api/v1/articles', article);
+    const res = await axios.post(`${process.env.VITE_BASE_URL}/articles`, article);
     console.log('Successfully seeded advanced article!');
     console.log('Title:', res.data.title);
     console.log('ID:', res.data._id);

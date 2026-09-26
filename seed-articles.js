@@ -27,7 +27,7 @@ const seed = async () => {
   
   for (const article of articles) {
     try {
-      await axios.post('http://localhost:4000/api/v1/articles', article);
+      await axios.post(`${process.env.VITE_BASE_URL}/articles`, article);
       success++;
       console.log(`Seeded: ${article.title}`);
     } catch (err) {
