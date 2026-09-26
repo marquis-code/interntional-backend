@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
+import { EmailService } from '../utils/email.service';
 import { RegisterDto, LoginDto, SetupPasswordDto } from './auth.dto';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -25,7 +27,7 @@ export class AuthService {
       // No password Hash here since it's an approval flow
     });
 
-    // TODO: Send "Application Received" email here!
+    await this.emailService.sendApplicationReceivedEmail(user.email, user.firstName);
 
     return { message: 'Registration successful. Account is pending approval.' };
   }

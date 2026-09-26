@@ -18,6 +18,7 @@ import { UniverseModule } from './universe/universe.module';
 import { EventsModule } from './events/events.module';
 import { ArticlesModule } from './articles/articles.module';
 import { FormsModule } from './forms/forms.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { FormsModule } from './forms/forms.module';
     EventsModule,
     ArticlesModule,
     FormsModule,
+    UtilsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

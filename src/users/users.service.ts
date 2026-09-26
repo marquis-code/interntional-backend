@@ -4,13 +4,17 @@ import { Model } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { User, UserDocument, UserStatus, UserRole, Department, Permission } from './schemas/user.schema';
 import { paginateQuery, PaginationParams, PaginatedResult } from '../utils/pagination.util';
+import { EmailService } from '../utils/email.service';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private emailService: EmailService,
+  ) {}
 
   async findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email }).exec();
@@ -102,7 +106,9 @@ export class UsersService {
       { new: true }
     ).exec();
 
-    // TODO: Send "Account Approved" email with the setupToken!
+    if (user) {
+      await this.emailService.sendAccountApprovedEmail(user.email, user.firstName, setupToken);
+    }
     return user;
   }
 
@@ -113,7 +119,9 @@ export class UsersService {
       { new: true }
     ).exec();
 
-    // TODO: Send "Account Rejected" email!
+    if (user) {
+      await this.emailService.sendAccountRejectedEmail(user.email, user.firstName);
+    }
     return user;
   }
 
