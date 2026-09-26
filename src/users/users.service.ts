@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { User, UserDocument, UserStatus, UserRole, Department, Permission } from './schemas/user.schema';
 import { paginateQuery, PaginationParams, PaginatedResult } from '../utils/pagination.util';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,20 @@ export class UsersService {
 
   async findById(id: string): Promise<UserDocument | null> {
     return this.userModel.findById(id).exec();
+  }
+
+  async findBySetupToken(token: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      setupPasswordToken: token,
+      setupPasswordExpires: { $gt: new Date() }
+    }).exec();
+  }
+
+  async updatePasswordAndActivate(id: string, passwordHash: string): Promise<UserDocument | null> {
+    return this.userModel.findByIdAndUpdate(id, {
+      $set: { passwordHash },
+      $unset: { setupPasswordToken: 1, setupPasswordExpires: 1 }
+    }, { new: true }).exec();
   }
 
   async create(userDto: Partial<User>): Promise<UserDocument> {
@@ -70,24 +85,36 @@ export class UsersService {
   }
 
   async approveUser(id: string): Promise<UserDocument | null> {
-    return this.userModel.findByIdAndUpdate(
+    const setupToken = crypto.randomBytes(32).toString('hex');
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 48); // 48 hours to set password
+
+    const user = await this.userModel.findByIdAndUpdate(
       id,
       {
         $set: {
           status: UserStatus.APPROVED,
           subscriptionStartDate: new Date(),
+          setupPasswordToken: setupToken,
+          setupPasswordExpires: expires,
         },
       },
       { new: true }
     ).exec();
+
+    // TODO: Send "Account Approved" email with the setupToken!
+    return user;
   }
 
   async rejectUser(id: string): Promise<UserDocument | null> {
-    return this.userModel.findByIdAndUpdate(
+    const user = await this.userModel.findByIdAndUpdate(
       id,
       { $set: { status: UserStatus.REJECTED } },
       { new: true }
     ).exec();
+
+    // TODO: Send "Account Rejected" email!
+    return user;
   }
 
   async updateRole(id: string, role: UserRole): Promise<UserDocument> {

@@ -50,8 +50,14 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   passwordHash: string;
+
+  @Prop({ required: false })
+  setupPasswordToken: string;
+
+  @Prop({ required: false })
+  setupPasswordExpires: Date;
 
   @Prop({ required: true, enum: UserRole, default: UserRole.INTERN_MEMBER })
   role: UserRole;
