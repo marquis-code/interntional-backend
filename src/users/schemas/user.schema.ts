@@ -91,6 +91,23 @@ export class User {
 
   @Prop({ default: 0 })
   loginCount: number;
+
+  // -- International Specific Fields --
+  @Prop({ required: false })
+  country: string;
+
+  @Prop({ required: false })
+  phoneNumber: string;
+
+  @Prop({ required: false })
+  professionalBackground: string;
+
+  // -- Universe Specific Fields --
+  @Prop({ type: Types.ObjectId, ref: 'University', required: false })
+  universityId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Programme', required: false })
+  programmeId: Types.ObjectId;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

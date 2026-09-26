@@ -24,7 +24,11 @@ export class AuthService {
       lastName: registerDto.lastName,
       email: registerDto.email,
       verificationFileUrl: registerDto.verificationFileUrl,
-      // No password Hash here since it's an approval flow
+      country: registerDto.country,
+      phoneNumber: registerDto.phoneNumber,
+      professionalBackground: registerDto.professionalBackground,
+      universityId: registerDto.universityId,
+      programmeId: registerDto.programmeId,
     });
 
     await this.emailService.sendApplicationReceivedEmail(user.email, user.firstName);

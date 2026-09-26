@@ -3,6 +3,11 @@ export class RegisterDto {
   lastName: string;
   email: string;
   verificationFileUrl: string;
+  country?: string;
+  phoneNumber?: string;
+  professionalBackground?: string;
+  universityId?: string;
+  programmeId?: string;
 }
 
 export class LoginDto {
