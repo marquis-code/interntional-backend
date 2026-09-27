@@ -5,11 +5,11 @@ import { Resend } from 'resend';
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private resend: Resend;
-  private readonly fromEmail = 'Convo Commerce <noreply@convocommerce.com>'; // Update with verified domain
+  private readonly fromEmail = process.env.EMAIL_FROM || 'Medlabconvo <noreply@medlabconvo.com>';
 
   constructor() {
     // In production, use process.env.RESEND_API_KEY
-    this.resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key');
+    this.resend = new Resend(process.env.RESEND_API_KEY || process.env.RESEND_API || 're_dummy_key');
   }
 
   async sendApplicationReceivedEmail(email: string, firstName: string) {
