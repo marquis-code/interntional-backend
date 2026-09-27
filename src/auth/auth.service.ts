@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { Types } from 'mongoose';
 import { UsersService } from '../users/users.service';
 import { EmailService } from '../utils/email.service';
 import { RegisterDto, LoginDto, SetupPasswordDto } from './auth.dto';
@@ -27,8 +28,8 @@ export class AuthService {
       country: registerDto.country,
       phoneNumber: registerDto.phoneNumber,
       professionalBackground: registerDto.professionalBackground,
-      universityId: registerDto.universityId,
-      programmeId: registerDto.programmeId,
+      universityId: registerDto.universityId ? new Types.ObjectId(registerDto.universityId) : undefined,
+      programmeId: registerDto.programmeId ? new Types.ObjectId(registerDto.programmeId) : undefined,
     });
 
     await this.emailService.sendApplicationReceivedEmail(user.email, user.firstName);
