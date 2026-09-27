@@ -68,6 +68,9 @@ export declare class AuthService {
             permissions: string[];
         };
     }>;
+    adminResendOtp(email: string): Promise<{
+        message: string;
+    }>;
     adminForgotPassword(email: string): Promise<{
         message: string;
     }>;

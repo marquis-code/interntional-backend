@@ -56,6 +56,12 @@ export class AuthController {
     return this.authService.adminVerifyOtp(body.email, body.otp);
   }
 
+  /** Step 3: Resend OTP for admin */
+  @Post('admin/resend-otp')
+  async adminResendOtp(@Body() body: { email: string }) {
+    return this.authService.adminResendOtp(body.email);
+  }
+
   /** Admin forgot password */
   @Post('admin/forgot-password')
   async adminForgotPassword(@Body() body: { email: string }) {

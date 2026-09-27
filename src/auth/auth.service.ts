@@ -272,6 +272,32 @@ export class AuthService {
     };
   }
 
+  /** Resend admin OTP without needing password again */
+  async adminResendOtp(email: string) {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
+      throw new UnauthorizedException('Access denied.');
+    }
+
+    const user = await this.usersService.findByEmail(normalizedEmail);
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+
+    if (!this.ADMIN_ROLES.includes(user.role)) {
+      throw new UnauthorizedException('Access denied. Insufficient privileges.');
+    }
+
+    // Generate 6-digit OTP and cache it for 10 minutes
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await this.cacheManager.set(`admin_otp_${normalizedEmail}`, otp, 10 * 60 * 1000);
+
+    await this.emailService.sendAdminLoginOtpEmail(normalizedEmail, user.firstName, otp);
+
+    return { message: 'A new OTP has been sent to your email.' };
+  }
+
   /** Admin forgot password — sends reset link to admin email */
   async adminForgotPassword(email: string) {
     const normalizedEmail = email.toLowerCase().trim();

@@ -64,6 +64,11 @@ export declare class AuthController {
             permissions: string[];
         };
     }>;
+    adminResendOtp(body: {
+        email: string;
+    }): Promise<{
+        message: string;
+    }>;
     adminForgotPassword(body: {
         email: string;
     }): Promise<{

@@ -49,6 +49,9 @@ let AuthController = class AuthController {
     async adminVerifyOtp(body) {
         return this.authService.adminVerifyOtp(body.email, body.otp);
     }
+    async adminResendOtp(body) {
+        return this.authService.adminResendOtp(body.email);
+    }
     async adminForgotPassword(body) {
         return this.authService.adminForgotPassword(body.email);
     }
@@ -123,6 +126,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "adminVerifyOtp", null);
+__decorate([
+    (0, common_1.Post)('admin/resend-otp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "adminResendOtp", null);
 __decorate([
     (0, common_1.Post)('admin/forgot-password'),
     __param(0, (0, common_1.Body)()),

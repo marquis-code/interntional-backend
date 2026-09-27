@@ -262,6 +262,23 @@ let AuthService = class AuthService {
             },
         };
     }
+    async adminResendOtp(email) {
+        const normalizedEmail = email.toLowerCase().trim();
+        if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
+            throw new common_1.UnauthorizedException('Access denied.');
+        }
+        const user = await this.usersService.findByEmail(normalizedEmail);
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found.');
+        }
+        if (!this.ADMIN_ROLES.includes(user.role)) {
+            throw new common_1.UnauthorizedException('Access denied. Insufficient privileges.');
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        await this.cacheManager.set(`admin_otp_${normalizedEmail}`, otp, 10 * 60 * 1000);
+        await this.emailService.sendAdminLoginOtpEmail(normalizedEmail, user.firstName, otp);
+        return { message: 'A new OTP has been sent to your email.' };
+    }
     async adminForgotPassword(email) {
         const normalizedEmail = email.toLowerCase().trim();
         if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
