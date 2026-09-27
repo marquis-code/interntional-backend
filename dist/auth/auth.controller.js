@@ -43,6 +43,18 @@ let AuthController = class AuthController {
     async verifyOtp(body) {
         return this.authService.verifyOtp(body.email, body.otp);
     }
+    async adminLogin(body) {
+        return this.authService.adminLoginStep1(body.email, body.password);
+    }
+    async adminVerifyOtp(body) {
+        return this.authService.adminVerifyOtp(body.email, body.otp);
+    }
+    async adminForgotPassword(body) {
+        return this.authService.adminForgotPassword(body.email);
+    }
+    async adminResetPassword(body) {
+        return this.authService.adminResetPassword(body.token, body.password);
+    }
     async getProfile(req) {
         return this.authService.getProfile(req.user.userId);
     }
@@ -97,6 +109,34 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "verifyOtp", null);
+__decorate([
+    (0, common_1.Post)('admin/login'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "adminLogin", null);
+__decorate([
+    (0, common_1.Post)('admin/verify-otp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "adminVerifyOtp", null);
+__decorate([
+    (0, common_1.Post)('admin/forgot-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "adminForgotPassword", null);
+__decorate([
+    (0, common_1.Post)('admin/reset-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "adminResetPassword", null);
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Get)('me'),

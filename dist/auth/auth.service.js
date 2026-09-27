@@ -201,6 +201,93 @@ let AuthService = class AuthService {
         await this.usersService.resetPassword(user._id.toString(), passwordHash);
         return { message: 'Password has been successfully reset. You can now log in.' };
     }
+    ALLOWED_ADMIN_EMAILS = [
+        'interntional@medlabconvo.com',
+        'universe@medlabconvo.com',
+        'marquis@medlabconvo.com',
+    ];
+    ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'DEPARTMENT_HEAD'];
+    async adminLoginStep1(email, password) {
+        const normalizedEmail = email.toLowerCase().trim();
+        if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
+            throw new common_1.UnauthorizedException('Access denied. This email is not authorised for admin access.');
+        }
+        const user = await this.usersService.findByEmail(normalizedEmail);
+        if (!user || !user.passwordHash) {
+            throw new common_1.UnauthorizedException('Invalid credentials.');
+        }
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        if (!isMatch) {
+            throw new common_1.UnauthorizedException('Invalid credentials.');
+        }
+        if (user.status !== 'APPROVED') {
+            throw new common_1.UnauthorizedException('Account is not approved.');
+        }
+        if (!this.ADMIN_ROLES.includes(user.role)) {
+            throw new common_1.UnauthorizedException('Access denied. Insufficient privileges.');
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        await this.cacheManager.set(`admin_otp_${normalizedEmail}`, otp, 10 * 60 * 1000);
+        await this.emailService.sendAdminLoginOtpEmail(normalizedEmail, user.firstName, otp);
+        return { message: 'OTP sent to your email. Please verify to continue.', email: normalizedEmail };
+    }
+    async adminVerifyOtp(email, otp) {
+        const normalizedEmail = email.toLowerCase().trim();
+        const cachedOtp = await this.cacheManager.get(`admin_otp_${normalizedEmail}`);
+        if (!cachedOtp || cachedOtp !== otp) {
+            throw new common_1.BadRequestException('Invalid or expired OTP.');
+        }
+        await this.cacheManager.del(`admin_otp_${normalizedEmail}`);
+        const user = await this.usersService.findByEmail(normalizedEmail);
+        if (!user)
+            throw new common_1.UnauthorizedException('User not found.');
+        await this.usersService.trackLogin(user._id.toString());
+        const payload = {
+            sub: user._id,
+            email: user.email,
+            role: user.role,
+            department: user.department,
+            permissions: user.permissions || [],
+        };
+        return {
+            access_token: this.jwtService.sign(payload),
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                department: user.department,
+                permissions: user.permissions,
+            },
+        };
+    }
+    async adminForgotPassword(email) {
+        const normalizedEmail = email.toLowerCase().trim();
+        if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
+            return { message: 'If that email exists, a reset link has been sent.' };
+        }
+        const user = await this.usersService.findByEmail(normalizedEmail);
+        if (!user) {
+            return { message: 'If that email exists, a reset link has been sent.' };
+        }
+        const token = require('crypto').randomBytes(32).toString('hex');
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1);
+        await this.usersService.setResetPasswordToken(normalizedEmail, token, expires);
+        await this.emailService.sendAdminPasswordResetEmail(normalizedEmail, user.firstName, token);
+        return { message: 'If that email exists, a reset link has been sent.' };
+    }
+    async adminResetPassword(token, newPassword) {
+        const user = await this.usersService.findByResetToken(token);
+        if (!user) {
+            throw new common_1.BadRequestException('Invalid or expired reset token.');
+        }
+        const salt = await bcrypt.genSalt();
+        const passwordHash = await bcrypt.hash(newPassword, salt);
+        await this.usersService.resetPassword(user._id.toString(), passwordHash);
+        return { message: 'Password reset successfully. You can now log in.' };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

@@ -235,6 +235,58 @@ let EmailService = EmailService_1 = class EmailService {
             this.logger.error(`Failed to send upgrade reminder to ${email}`, error);
         }
     }
+    async sendAdminLoginOtpEmail(email, firstName, otp) {
+        const title = 'Admin Login Verification Code';
+        const bodyContent = `
+      <h2 style="color: #1f2937; margin-bottom: 20px;">Hello ${firstName},</h2>
+      <p style="margin-bottom: 15px;">Someone (hopefully you) just attempted to sign in to the Admin Portal. Use the code below to complete your login.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <span style="font-size: 36px; font-weight: 900; letter-spacing: 8px; color: #1f2937; background-color: #f0f9ff; border: 2px solid #27628C; padding: 14px 28px; border-radius: 10px; display: inline-block;">${otp}</span>
+      </div>
+      <p style="margin-top: 20px; color: #6b7280;">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</p>
+      <p style="margin-top: 10px; color: #ef4444;">If you did not attempt to log in, please contact your system administrator immediately.</p>
+    `;
+        const html = (0, email_template_1.buildEmailTemplate)(title, bodyContent, 'intern');
+        try {
+            await this.resend.emails.send({
+                from: this.fromEmail,
+                to: email,
+                subject: `[Admin] Your login verification code is ${otp}`,
+                html,
+            });
+            this.logger.log(`Admin login OTP sent to ${email}`);
+        }
+        catch (error) {
+            this.logger.error(`Failed to send admin OTP to ${email}`, error);
+        }
+    }
+    async sendAdminPasswordResetEmail(email, firstName, token) {
+        const resetUrl = `https://admin.medlabconvo.com/reset-password?token=${token}`;
+        const title = 'Admin Password Reset Request';
+        const bodyContent = `
+      <h2 style="color: #1f2937; margin-bottom: 20px;">Hello ${firstName},</h2>
+      <p style="margin-bottom: 15px;">We received a request to reset your Admin Portal password. If you didn't make this request, please ignore this email.</p>
+      <p style="margin-bottom: 25px;">Click the button below to reset your password. This link expires in <strong>1 hour</strong>.</p>
+      <div style="text-align: center; margin-bottom: 30px;">
+        <a href="${resetUrl}" style="background-color: #27628C; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Reset Admin Password</a>
+      </div>
+      <p style="color: #6b7280; font-size: 13px;">Or copy this link: <br/><a href="${resetUrl}" style="color: #27628C;">${resetUrl}</a></p>
+      <p style="margin-top: 20px; color: #ef4444; font-size: 13px;">⚠️ Never share this link with anyone.</p>
+    `;
+        const html = (0, email_template_1.buildEmailTemplate)(title, bodyContent, 'intern');
+        try {
+            await this.resend.emails.send({
+                from: this.fromEmail,
+                to: email,
+                subject: 'Admin Portal — Password Reset Request',
+                html,
+            });
+            this.logger.log(`Admin password reset email sent to ${email}`);
+        }
+        catch (error) {
+            this.logger.error(`Failed to send admin password reset email to ${email}`, error);
+        }
+    }
 };
 exports.EmailService = EmailService;
 exports.EmailService = EmailService = EmailService_1 = __decorate([

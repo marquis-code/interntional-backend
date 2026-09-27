@@ -11,4 +11,6 @@ export declare class EmailService {
     sendSubscriptionReminderEmail(email: string, firstName: string, planName: string, daysLeft: number, source?: 'intern' | 'universe'): Promise<void>;
     sendOtpEmail(email: string, firstName: string, otp: string, source?: 'intern' | 'universe'): Promise<void>;
     sendUpgradeReminderEmail(email: string, firstName: string, currentPlan: string, source?: 'intern' | 'universe'): Promise<void>;
+    sendAdminLoginOtpEmail(email: string, firstName: string, otp: string): Promise<void>;
+    sendAdminPasswordResetEmail(email: string, firstName: string, token: string): Promise<void>;
 }

@@ -42,6 +42,32 @@ export class AuthController {
     return this.authService.verifyOtp(body.email, body.otp);
   }
 
+  // ── ADMIN-SPECIFIC ENDPOINTS ─────────────────────────────────────
+
+  /** Step 1: Admin submits email+password → validates creds, sends OTP */
+  @Post('admin/login')
+  async adminLogin(@Body() body: { email: string; password: string }) {
+    return this.authService.adminLoginStep1(body.email, body.password);
+  }
+
+  /** Step 2: Admin submits the OTP received by email → returns JWT */
+  @Post('admin/verify-otp')
+  async adminVerifyOtp(@Body() body: { email: string; otp: string }) {
+    return this.authService.adminVerifyOtp(body.email, body.otp);
+  }
+
+  /** Admin forgot password */
+  @Post('admin/forgot-password')
+  async adminForgotPassword(@Body() body: { email: string }) {
+    return this.authService.adminForgotPassword(body.email);
+  }
+
+  /** Admin reset password */
+  @Post('admin/reset-password')
+  async adminResetPassword(@Body() body: { token: string; password: string }) {
+    return this.authService.adminResetPassword(body.token, body.password);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async getProfile(@Request() req: any) {

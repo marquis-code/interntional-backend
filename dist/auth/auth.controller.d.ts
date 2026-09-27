@@ -42,5 +42,38 @@ export declare class AuthController {
         success: boolean;
         emailVerified: boolean;
     }>;
+    adminLogin(body: {
+        email: string;
+        password: string;
+    }): Promise<{
+        message: string;
+        email: string;
+    }>;
+    adminVerifyOtp(body: {
+        email: string;
+        otp: string;
+    }): Promise<{
+        access_token: string;
+        user: {
+            id: import("mongoose").Types.ObjectId;
+            firstName: string;
+            lastName: string;
+            email: string;
+            role: import("../users/schemas/user.schema").UserRole;
+            department: import("../users/schemas/user.schema").Department;
+            permissions: string[];
+        };
+    }>;
+    adminForgotPassword(body: {
+        email: string;
+    }): Promise<{
+        message: string;
+    }>;
+    adminResetPassword(body: {
+        token: string;
+        password: string;
+    }): Promise<{
+        message: string;
+    }>;
     getProfile(req: any): Promise<import("../users/schemas/user.schema").UserDocument>;
 }

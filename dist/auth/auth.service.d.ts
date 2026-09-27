@@ -50,4 +50,28 @@ export declare class AuthService {
     }): Promise<{
         message: string;
     }>;
+    private readonly ALLOWED_ADMIN_EMAILS;
+    private readonly ADMIN_ROLES;
+    adminLoginStep1(email: string, password: string): Promise<{
+        message: string;
+        email: string;
+    }>;
+    adminVerifyOtp(email: string, otp: string): Promise<{
+        access_token: string;
+        user: {
+            id: Types.ObjectId;
+            firstName: string;
+            lastName: string;
+            email: string;
+            role: import("../users/schemas/user.schema").UserRole;
+            department: import("../users/schemas/user.schema").Department;
+            permissions: string[];
+        };
+    }>;
+    adminForgotPassword(email: string): Promise<{
+        message: string;
+    }>;
+    adminResetPassword(token: string, newPassword: string): Promise<{
+        message: string;
+    }>;
 }
