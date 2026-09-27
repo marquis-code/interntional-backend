@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSchema = exports.User = exports.Permission = exports.Department = exports.UserStatus = exports.UserRole = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 var UserRole;
 (function (UserRole) {
     UserRole["SUPER_ADMIN"] = "SUPER_ADMIN";
@@ -52,6 +53,10 @@ let User = class User {
     lastName;
     email;
     passwordHash;
+    setupPasswordToken;
+    setupPasswordExpires;
+    resetPasswordToken;
+    resetPasswordExpires;
     role;
     status;
     department;
@@ -60,8 +65,15 @@ let User = class User {
     subscriptionStartDate;
     subscriptionEndDate;
     isSubscriptionActive;
+    activeSubscription;
     lastLoginAt;
     loginCount;
+    country;
+    phoneNumber;
+    professionalBackground;
+    universityId;
+    programmeId;
+    paystackAuthCode;
 };
 exports.User = User;
 __decorate([
@@ -77,9 +89,25 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], User.prototype, "passwordHash", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], User.prototype, "setupPasswordToken", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", Date)
+], User.prototype, "setupPasswordExpires", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], User.prototype, "resetPasswordToken", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", Date)
+], User.prototype, "resetPasswordExpires", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true, enum: UserRole, default: UserRole.INTERN_MEMBER }),
     __metadata("design:type", String)
@@ -113,6 +141,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "isSubscriptionActive", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Subscription', default: null }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], User.prototype, "activeSubscription", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ default: null }),
     __metadata("design:type", Date)
 ], User.prototype, "lastLoginAt", void 0);
@@ -120,6 +152,30 @@ __decorate([
     (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)
 ], User.prototype, "loginCount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], User.prototype, "country", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], User.prototype, "phoneNumber", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], User.prototype, "professionalBackground", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'University', required: false }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], User.prototype, "universityId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Programme', required: false }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], User.prototype, "programmeId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], User.prototype, "paystackAuthCode", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);

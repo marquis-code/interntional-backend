@@ -17,12 +17,15 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const events_schema_1 = require("./events.schema");
+const user_schema_1 = require("../users/schemas/user.schema");
 let EventsService = class EventsService {
     eventModel;
     registrationModel;
-    constructor(eventModel, registrationModel) {
+    userModel;
+    constructor(eventModel, registrationModel, userModel) {
         this.eventModel = eventModel;
         this.registrationModel = registrationModel;
+        this.userModel = userModel;
     }
     async getEvents() { return this.eventModel.find().sort({ date: -1 }).exec(); }
     async getEvent(id) { return this.eventModel.findById(id).exec(); }
@@ -38,6 +41,13 @@ let EventsService = class EventsService {
             throw new Error('Event not found');
         if (!event.registrationOpen)
             throw new Error('Registration is closed');
+        if (event.isMembersOnly) {
+            const user = await this.userModel.findOne({ email: data.email }).exec();
+            if (!user)
+                throw new Error('This event is restricted to members only.');
+            if (!user.isSubscriptionActive)
+                throw new Error('An active premium subscription is required to register for this event.');
+        }
         if (event.capacity > 0) {
             const count = await this.registrationModel.countDocuments({ eventId }).exec();
             if (count >= event.capacity)
@@ -68,7 +78,9 @@ exports.EventsService = EventsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(events_schema_1.Event.name)),
     __param(1, (0, mongoose_1.InjectModel)(events_schema_1.EventRegistration.name)),
+    __param(2, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         mongoose_2.Model])
 ], EventsService);
 //# sourceMappingURL=events.service.js.map

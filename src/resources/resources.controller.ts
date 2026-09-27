@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Patch,
   Delete,
   Param,
   Body,
@@ -59,5 +61,29 @@ export class ResourcesController {
   async remove(@Param('id') id: string) {
     await this.resourceModel.findByIdAndDelete(id).exec();
     return { message: 'Resource deleted successfully' };
+  }
+
+  // PUT /resources/:id – update a resource
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() body: { title?: string; description?: string; category?: string; type?: string; fileUrl?: string }) {
+    const updated = await this.resourceModel.findByIdAndUpdate(
+      id,
+      { $set: body },
+      { new: true }
+    ).exec();
+    if (!updated) throw new Error('Resource not found');
+    return updated;
+  }
+
+  // PATCH /resources/:id – partial update a resource
+  @Patch(':id')
+  async partialUpdate(@Param('id') id: string, @Body() body: { title?: string; description?: string; category?: string; type?: string; fileUrl?: string }) {
+    const updated = await this.resourceModel.findByIdAndUpdate(
+      id,
+      { $set: body },
+      { new: true }
+    ).exec();
+    if (!updated) throw new Error('Resource not found');
+    return updated;
   }
 }

@@ -43,13 +43,13 @@ async function bootstrap() {
     });
   }
 
-  // Create International User - Free Plan
-  let intlFree = await userModel.findOne({ email: 'intl.free@example.com' });
+  // Create International User - Free Plan v2
+  let intlFree = await userModel.findOne({ email: 'intl.free2@example.com' });
   if (!intlFree) {
     await userModel.create({
-      firstName: 'Intl',
-      lastName: 'FreeUser',
-      email: 'intl.free@example.com',
+      firstName: 'Intl2',
+      lastName: 'FreeUser2',
+      email: 'intl.free2@example.com',
       passwordHash: pass,
       role: UserRole.INTERN_MEMBER,
       status: UserStatus.APPROVED,
@@ -63,18 +63,18 @@ async function bootstrap() {
       subscriptionStartDate: new Date(),
       subscriptionEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     });
-    console.log('Created intl.free@example.com');
+    console.log('Created intl.free2@example.com');
   } else {
-    console.log('intl.free@example.com already exists');
+    console.log('intl.free2@example.com already exists');
   }
 
-  // Create International User - Premium Plan
-  let intlPremium = await userModel.findOne({ email: 'intl.premium@example.com' });
+  // Create International User - Premium Plan v2
+  let intlPremium = await userModel.findOne({ email: 'intl.premium2@example.com' });
   if (!intlPremium) {
     await userModel.create({
-      firstName: 'Intl',
-      lastName: 'PremiumUser',
-      email: 'intl.premium@example.com',
+      firstName: 'Intl2',
+      lastName: 'PremiumUser2',
+      email: 'intl.premium2@example.com',
       passwordHash: pass,
       role: UserRole.INTERN_MEMBER,
       status: UserStatus.APPROVED,
@@ -88,18 +88,18 @@ async function bootstrap() {
       subscriptionStartDate: new Date(),
       subscriptionEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     });
-    console.log('Created intl.premium@example.com');
+    console.log('Created intl.premium2@example.com');
   } else {
-    console.log('intl.premium@example.com already exists');
+    console.log('intl.premium2@example.com already exists');
   }
 
-  // Create Universe User - Free Plan
-  let uniFree = await userModel.findOne({ email: 'uni.free@example.com' });
+  // Create Universe User - Free Plan v2
+  let uniFree = await userModel.findOne({ email: 'uni.free2@example.com' });
   if (!uniFree) {
     await userModel.create({
-      firstName: 'Uni',
-      lastName: 'FreeUser',
-      email: 'uni.free@example.com',
+      firstName: 'Uni2',
+      lastName: 'FreeUser2',
+      email: 'uni.free2@example.com',
       passwordHash: pass,
       role: UserRole.INTERN_MEMBER,
       status: UserStatus.APPROVED,
@@ -112,18 +112,18 @@ async function bootstrap() {
       subscriptionStartDate: new Date(),
       subscriptionEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     });
-    console.log('Created uni.free@example.com');
+    console.log('Created uni.free2@example.com');
   } else {
-    console.log('uni.free@example.com already exists');
+    console.log('uni.free2@example.com already exists');
   }
 
-  // Create Universe User - Premium Plan
-  let uniPremium = await userModel.findOne({ email: 'uni.premium@example.com' });
+  // Create Universe User - Premium Plan v2
+  let uniPremium = await userModel.findOne({ email: 'uni.premium2@example.com' });
   if (!uniPremium) {
     await userModel.create({
-      firstName: 'Uni',
-      lastName: 'PremiumUser',
-      email: 'uni.premium@example.com',
+      firstName: 'Uni2',
+      lastName: 'PremiumUser2',
+      email: 'uni.premium2@example.com',
       passwordHash: pass,
       role: UserRole.INTERN_MEMBER,
       status: UserStatus.APPROVED,
@@ -136,9 +136,9 @@ async function bootstrap() {
       subscriptionStartDate: new Date(),
       subscriptionEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     });
-    console.log('Created uni.premium@example.com');
+    console.log('Created uni.premium2@example.com');
   } else {
-    console.log('uni.premium@example.com already exists');
+    console.log('uni.premium2@example.com already exists');
   }
 
   console.log('Done!');

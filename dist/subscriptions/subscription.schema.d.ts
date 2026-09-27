@@ -6,6 +6,11 @@ export declare class Subscription {
     price: number;
     durationMonths: number;
     features: string[];
+    maxMentorshipRequests: number;
+    canAccessVault: boolean;
+    canPostArticles: boolean;
+    canAccessGlobalCommunity: boolean;
+    eventDiscountPercentage: number;
     isActive: boolean;
 }
 export declare const SubscriptionSchema: import("mongoose").Schema<Subscription, import("mongoose").Model<Subscription, any, any, any, any, any, Subscription>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Subscription, Document<unknown, {}, Subscription, {
@@ -54,6 +59,51 @@ export declare const SubscriptionSchema: import("mongoose").Schema<Subscription,
         id: string;
     }>> | undefined;
     features?: import("mongoose").SchemaDefinitionProperty<string[], Subscription, Document<unknown, {}, Subscription, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Subscription & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    maxMentorshipRequests?: import("mongoose").SchemaDefinitionProperty<number, Subscription, Document<unknown, {}, Subscription, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Subscription & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    canAccessVault?: import("mongoose").SchemaDefinitionProperty<boolean, Subscription, Document<unknown, {}, Subscription, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Subscription & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    canPostArticles?: import("mongoose").SchemaDefinitionProperty<boolean, Subscription, Document<unknown, {}, Subscription, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Subscription & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    canAccessGlobalCommunity?: import("mongoose").SchemaDefinitionProperty<boolean, Subscription, Document<unknown, {}, Subscription, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Subscription & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    eventDiscountPercentage?: import("mongoose").SchemaDefinitionProperty<number, Subscription, Document<unknown, {}, Subscription, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Subscription & {
         _id: import("mongoose").Types.ObjectId;

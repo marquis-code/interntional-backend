@@ -61,6 +61,7 @@ export class PaymentsService {
           amount: amountInKobo, // Amount in kobo
           reference,
           callback_url: callbackUrl,
+          channels: ['card'],
           metadata: {
             userId,
             subscriptionId,
@@ -117,7 +118,8 @@ export class PaymentsService {
         await payment.save();
 
         // Activate the user's subscription
-        await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString());
+        const authCode = data.authorization?.authorization_code;
+        await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString(), authCode);
 
         return { message: 'Payment verified successfully', payment, verified: true };
       } else {
@@ -152,7 +154,8 @@ export class PaymentsService {
       await payment.save();
 
       // Activate subscription
-      await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString());
+      const authCode = eventData.data?.authorization?.authorization_code;
+      await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString(), authCode);
 
       return { message: 'Webhook processed successfully' };
     }
@@ -162,10 +165,10 @@ export class PaymentsService {
   /**
    * Activate user subscription after successful payment
    */
-  private async activateUserSubscription(userId: string, subscriptionId: string) {
+  private async activateUserSubscription(userId: string, subscriptionId: string, authCode?: string) {
     try {
       const plan = await this.subscriptionsService.findById(subscriptionId);
-      await this.usersService.activateSubscription(userId, subscriptionId, plan.durationMonths);
+      await this.usersService.activateSubscription(userId, subscriptionId, plan.durationMonths, authCode);
     } catch (error) {
       // Log but don't throw — payment was already successful
       console.error('Failed to activate subscription for user:', userId, error);

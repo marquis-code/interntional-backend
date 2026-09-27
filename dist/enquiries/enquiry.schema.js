@@ -14,8 +14,14 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Enquiry = class Enquiry extends mongoose_2.Document {
     name;
+    firstName;
+    lastName;
     email;
+    phone;
+    topic;
+    userType;
     message;
+    application;
     status;
 };
 exports.Enquiry = Enquiry;
@@ -24,13 +30,37 @@ __decorate([
     __metadata("design:type", String)
 ], Enquiry.prototype, "name", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Enquiry.prototype, "firstName", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Enquiry.prototype, "lastName", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Enquiry.prototype, "email", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Enquiry.prototype, "phone", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Enquiry.prototype, "topic", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Enquiry.prototype, "userType", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Enquiry.prototype, "message", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 'universe' }),
+    __metadata("design:type", String)
+], Enquiry.prototype, "application", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: 'unread', enum: ['unread', 'read'] }),
     __metadata("design:type", String)

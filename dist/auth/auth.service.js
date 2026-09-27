@@ -41,38 +41,91 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
+const mongoose_1 = require("mongoose");
+const cache_manager_1 = require("@nestjs/cache-manager");
 const users_service_1 = require("../users/users.service");
+const email_service_1 = require("../utils/email.service");
+const payments_service_1 = require("../payments/payments.service");
+const subscriptions_service_1 = require("../subscriptions/subscriptions.service");
 let AuthService = class AuthService {
     usersService;
     jwtService;
-    constructor(usersService, jwtService) {
+    emailService;
+    paymentsService;
+    subscriptionsService;
+    cacheManager;
+    constructor(usersService, jwtService, emailService, paymentsService, subscriptionsService, cacheManager) {
         this.usersService = usersService;
         this.jwtService = jwtService;
+        this.emailService = emailService;
+        this.paymentsService = paymentsService;
+        this.subscriptionsService = subscriptionsService;
+        this.cacheManager = cacheManager;
     }
     async register(registerDto) {
         const existingUser = await this.usersService.findByEmail(registerDto.email);
         if (existingUser) {
             throw new common_1.BadRequestException('User with this email already exists');
         }
-        const salt = await bcrypt.genSalt();
-        const passwordHash = await bcrypt.hash(registerDto.password, salt);
+        let passwordHash;
+        if (registerDto.password) {
+            const salt = await bcrypt.genSalt();
+            passwordHash = await bcrypt.hash(registerDto.password, salt);
+        }
         const user = await this.usersService.create({
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
             email: registerDto.email,
             passwordHash,
             verificationFileUrl: registerDto.verificationFileUrl,
+            country: registerDto.country,
+            phoneNumber: registerDto.phoneNumber,
+            professionalBackground: registerDto.professionalBackground,
+            department: registerDto.professionalBackground,
+            universityId: registerDto.universityId ? new mongoose_1.Types.ObjectId(registerDto.universityId) : undefined,
+            programmeId: registerDto.programmeId ? new mongoose_1.Types.ObjectId(registerDto.programmeId) : undefined,
+            activeSubscription: registerDto.planId ? new mongoose_1.Types.ObjectId(registerDto.planId) : undefined,
         });
-        return { message: 'Registration successful. Account is pending approval.' };
+        await this.emailService.sendApplicationReceivedEmail(user.email, user.firstName);
+        let authorization_url = undefined;
+        if (registerDto.planId) {
+            try {
+                const plan = await this.subscriptionsService.findById(registerDto.planId);
+                if (plan && plan.price > 0) {
+                    const paymentRes = await this.paymentsService.initializePayment(user._id.toString(), registerDto.planId, user.email, registerDto.callbackUrl || 'http://localhost:3000/verification');
+                    authorization_url = paymentRes.authorization_url;
+                }
+            }
+            catch (error) {
+                console.error('Failed to initialize payment during registration', error);
+            }
+        }
+        return {
+            message: 'Registration successful. Account is pending approval.',
+            authorization_url
+        };
+    }
+    async setupPassword(setupDto) {
+        const user = await this.usersService.findBySetupToken(setupDto.token);
+        if (!user) {
+            throw new common_1.BadRequestException('Invalid or expired setup token.');
+        }
+        const salt = await bcrypt.genSalt();
+        const passwordHash = await bcrypt.hash(setupDto.password, salt);
+        await this.usersService.updatePasswordAndActivate(user._id.toString(), passwordHash);
+        return { message: 'Password set successfully. You can now login.' };
     }
     async login(loginDto) {
         const user = await this.usersService.findByEmail(loginDto.email);
-        if (!user) {
+        if (!user || !user.passwordHash) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
         const isMatch = await bcrypt.compare(loginDto.password, user.passwordHash);
@@ -103,11 +156,60 @@ let AuthService = class AuthService {
             },
         };
     }
+    async getProfile(userId) {
+        const user = await this.usersService.findByIdWithSubscription(userId);
+        if (!user)
+            throw new common_1.UnauthorizedException('User not found');
+        return user;
+    }
+    async sendOtp(email, firstName, source = 'intern') {
+        const existingUser = await this.usersService.findByEmail(email);
+        if (existingUser) {
+            throw new common_1.BadRequestException('User with this email already exists');
+        }
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+        await this.cacheManager.set(`otp_${email}`, otp, 10 * 60 * 1000);
+        await this.emailService.sendOtpEmail(email, firstName, otp, source);
+        return { message: 'OTP sent to email.' };
+    }
+    async verifyOtp(email, otp) {
+        const cachedOtp = await this.cacheManager.get(`otp_${email}`);
+        if (cachedOtp === otp) {
+            return { success: true, emailVerified: true };
+        }
+        throw new common_1.BadRequestException('Invalid or expired OTP.');
+    }
+    async forgotPassword(email, source = 'intern') {
+        const user = await this.usersService.findByEmail(email);
+        if (!user) {
+            return { message: 'If that email exists, a reset link has been sent.' };
+        }
+        const token = require('crypto').randomBytes(32).toString('hex');
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1);
+        await this.usersService.setResetPasswordToken(email, token, expires);
+        await this.emailService.sendPasswordResetEmail(user.email, user.firstName, token, source);
+        return { message: 'If that email exists, a reset link has been sent.' };
+    }
+    async resetPassword(resetDto) {
+        const user = await this.usersService.findByResetToken(resetDto.token);
+        if (!user) {
+            throw new common_1.BadRequestException('Invalid or expired reset token.');
+        }
+        const salt = await bcrypt.genSalt();
+        const passwordHash = await bcrypt.hash(resetDto.password, salt);
+        await this.usersService.resetPassword(user._id.toString(), passwordHash);
+        return { message: 'Password has been successfully reset. You can now log in.' };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(5, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        email_service_1.EmailService,
+        payments_service_1.PaymentsService,
+        subscriptions_service_1.SubscriptionsService, Object])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

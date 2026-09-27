@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 export type UserDocument = User & Document;
 export declare enum UserRole {
     SUPER_ADMIN = "SUPER_ADMIN",
@@ -37,6 +37,10 @@ export declare class User {
     lastName: string;
     email: string;
     passwordHash: string;
+    setupPasswordToken: string;
+    setupPasswordExpires: Date;
+    resetPasswordToken: string;
+    resetPasswordExpires: Date;
     role: UserRole;
     status: UserStatus;
     department: Department;
@@ -45,13 +49,20 @@ export declare class User {
     subscriptionStartDate: Date;
     subscriptionEndDate: Date;
     isSubscriptionActive: boolean;
+    activeSubscription: Types.ObjectId;
     lastLoginAt: Date;
     loginCount: number;
+    country: string;
+    phoneNumber: string;
+    professionalBackground: string;
+    universityId: Types.ObjectId;
+    programmeId: Types.ObjectId;
+    paystackAuthCode: string;
 }
 export declare const UserSchema: import("mongoose").Schema<User, import("mongoose").Model<User, any, any, any, any, any, User>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, User, Document<unknown, {}, User, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-    _id: import("mongoose").Types.ObjectId;
+    _id: Types.ObjectId;
 } & {
     __v: number;
 }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -60,7 +71,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     firstName?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -69,7 +80,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     lastName?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -78,7 +89,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     email?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -87,7 +98,43 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     passwordHash?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    setupPasswordToken?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    setupPasswordExpires?: import("mongoose").SchemaDefinitionProperty<Date, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    resetPasswordToken?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    resetPasswordExpires?: import("mongoose").SchemaDefinitionProperty<Date, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -96,7 +143,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     role?: import("mongoose").SchemaDefinitionProperty<UserRole, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -105,7 +152,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     status?: import("mongoose").SchemaDefinitionProperty<UserStatus, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -114,7 +161,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     department?: import("mongoose").SchemaDefinitionProperty<Department, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -123,7 +170,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     permissions?: import("mongoose").SchemaDefinitionProperty<string[], User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -132,7 +179,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     verificationFileUrl?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -141,7 +188,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     subscriptionStartDate?: import("mongoose").SchemaDefinitionProperty<Date, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -150,7 +197,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     subscriptionEndDate?: import("mongoose").SchemaDefinitionProperty<Date, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -159,7 +206,16 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     isSubscriptionActive?: import("mongoose").SchemaDefinitionProperty<boolean, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    activeSubscription?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -168,7 +224,7 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     lastLoginAt?: import("mongoose").SchemaDefinitionProperty<Date, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -177,7 +233,61 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
     loginCount?: import("mongoose").SchemaDefinitionProperty<number, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    country?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    phoneNumber?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    professionalBackground?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    universityId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    programmeId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    paystackAuthCode?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{

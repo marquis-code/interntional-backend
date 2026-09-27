@@ -106,6 +106,23 @@ export declare class Event {
     speaker: string;
     status: string;
     registrationOpen: boolean;
+    price: number;
+    isMembersOnly: boolean;
+    tags: string[];
+    agenda: {
+        time: string;
+        title: string;
+        speaker: string;
+    }[];
+    attachments: {
+        name: string;
+        url: string;
+    }[];
+    sponsors: {
+        name: string;
+        logo: string;
+        website: string;
+    }[];
 }
 export declare const EventSchema: import("mongoose").Schema<Event, import("mongoose").Model<Event, any, any, any, any, any, Event>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Event, Document<unknown, {}, Event, {
     id: string;
@@ -216,6 +233,71 @@ export declare const EventSchema: import("mongoose").Schema<Event, import("mongo
         id: string;
     }>> | undefined;
     registrationOpen?: import("mongoose").SchemaDefinitionProperty<boolean, Event, Document<unknown, {}, Event, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Event & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    price?: import("mongoose").SchemaDefinitionProperty<number, Event, Document<unknown, {}, Event, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Event & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    isMembersOnly?: import("mongoose").SchemaDefinitionProperty<boolean, Event, Document<unknown, {}, Event, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Event & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    tags?: import("mongoose").SchemaDefinitionProperty<string[], Event, Document<unknown, {}, Event, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Event & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    agenda?: import("mongoose").SchemaDefinitionProperty<{
+        time: string;
+        title: string;
+        speaker: string;
+    }[], Event, Document<unknown, {}, Event, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Event & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    attachments?: import("mongoose").SchemaDefinitionProperty<{
+        name: string;
+        url: string;
+    }[], Event, Document<unknown, {}, Event, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Event & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    sponsors?: import("mongoose").SchemaDefinitionProperty<{
+        name: string;
+        logo: string;
+        website: string;
+    }[], Event, Document<unknown, {}, Event, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Event & {
         _id: Types.ObjectId;

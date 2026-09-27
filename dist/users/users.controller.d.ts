@@ -24,10 +24,12 @@ export declare class UsersController {
     }>;
     getMentors(): Promise<import("../utils/pagination.util").PaginatedResult<any>>;
     getByDepartment(department: string): Promise<any[]>;
+    getById(id: string): Promise<import("./schemas/user.schema").UserDocument | null>;
     approve(id: string): Promise<import("./schemas/user.schema").UserDocument | null>;
     reject(id: string): Promise<import("./schemas/user.schema").UserDocument | null>;
     revoke(id: string): Promise<import("./schemas/user.schema").UserDocument | null>;
     updateRole(id: string, role: UserRole): Promise<import("./schemas/user.schema").UserDocument>;
     updateDepartment(id: string, department: Department): Promise<import("./schemas/user.schema").UserDocument>;
     updatePermissions(id: string, permissions: string[]): Promise<import("./schemas/user.schema").UserDocument>;
+    cancelSubscription(req: any): Promise<import("./schemas/user.schema").UserDocument>;
 }

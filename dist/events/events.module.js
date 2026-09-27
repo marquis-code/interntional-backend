@@ -12,6 +12,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const events_controller_1 = require("./events.controller");
 const events_service_1 = require("./events.service");
 const events_schema_1 = require("./events.schema");
+const user_schema_1 = require("../users/schemas/user.schema");
 let EventsModule = class EventsModule {
 };
 exports.EventsModule = EventsModule;
@@ -21,6 +22,7 @@ exports.EventsModule = EventsModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: events_schema_1.Event.name, schema: events_schema_1.EventSchema },
                 { name: events_schema_1.EventRegistration.name, schema: events_schema_1.EventRegistrationSchema },
+                { name: user_schema_1.User.name, schema: user_schema_1.UserSchema },
             ])
         ],
         controllers: [events_controller_1.EventsController],

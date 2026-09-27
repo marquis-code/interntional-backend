@@ -1,17 +1,30 @@
 import { JwtService } from '@nestjs/jwt';
+import { Types } from 'mongoose';
+import type { Cache } from 'cache-manager';
 import { UsersService } from '../users/users.service';
-import { RegisterDto, LoginDto } from './auth.dto';
+import { EmailService } from '../utils/email.service';
+import { RegisterDto, LoginDto, SetupPasswordDto } from './auth.dto';
+import { PaymentsService } from '../payments/payments.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 export declare class AuthService {
     private usersService;
     private jwtService;
-    constructor(usersService: UsersService, jwtService: JwtService);
+    private emailService;
+    private paymentsService;
+    private subscriptionsService;
+    private cacheManager;
+    constructor(usersService: UsersService, jwtService: JwtService, emailService: EmailService, paymentsService: PaymentsService, subscriptionsService: SubscriptionsService, cacheManager: Cache);
     register(registerDto: RegisterDto): Promise<{
+        message: string;
+        authorization_url: string | undefined;
+    }>;
+    setupPassword(setupDto: SetupPasswordDto): Promise<{
         message: string;
     }>;
     login(loginDto: LoginDto): Promise<{
         access_token: string;
         user: {
-            id: import("mongoose").Types.ObjectId;
+            id: Types.ObjectId;
             firstName: string;
             lastName: string;
             email: string;
@@ -19,5 +32,22 @@ export declare class AuthService {
             department: import("../users/schemas/user.schema").Department;
             permissions: string[];
         };
+    }>;
+    getProfile(userId: string): Promise<import("../users/schemas/user.schema").UserDocument>;
+    sendOtp(email: string, firstName: string, source?: 'intern' | 'universe'): Promise<{
+        message: string;
+    }>;
+    verifyOtp(email: string, otp: string): Promise<{
+        success: boolean;
+        emailVerified: boolean;
+    }>;
+    forgotPassword(email: string, source?: 'intern' | 'universe'): Promise<{
+        message: string;
+    }>;
+    resetPassword(resetDto: {
+        token: string;
+        password: string;
+    }): Promise<{
+        message: string;
     }>;
 }

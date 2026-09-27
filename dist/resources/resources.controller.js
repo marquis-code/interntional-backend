@@ -51,6 +51,18 @@ let ResourcesController = class ResourcesController {
         await this.resourceModel.findByIdAndDelete(id).exec();
         return { message: 'Resource deleted successfully' };
     }
+    async update(id, body) {
+        const updated = await this.resourceModel.findByIdAndUpdate(id, { $set: body }, { new: true }).exec();
+        if (!updated)
+            throw new Error('Resource not found');
+        return updated;
+    }
+    async partialUpdate(id, body) {
+        const updated = await this.resourceModel.findByIdAndUpdate(id, { $set: body }, { new: true }).exec();
+        if (!updated)
+            throw new Error('Resource not found');
+        return updated;
+    }
 };
 exports.ResourcesController = ResourcesController;
 __decorate([
@@ -82,6 +94,22 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ResourcesController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ResourcesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ResourcesController.prototype, "partialUpdate", null);
 exports.ResourcesController = ResourcesController = __decorate([
     (0, common_1.Controller)('resources'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),

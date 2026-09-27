@@ -37,6 +37,7 @@
     "cache-manager": "^7.2.9",
     "cloudinary": "^2.11.0",
     "compression": "^1.8.2",
+    "juice": "^12.2.0",
     "mongoose": "^9.10.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

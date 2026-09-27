@@ -22,4 +22,30 @@ export declare class ResourcesController {
     remove(id: string): Promise<{
         message: string;
     }>;
+    update(id: string, body: {
+        title?: string;
+        description?: string;
+        category?: string;
+        type?: string;
+        fileUrl?: string;
+    }): Promise<import("mongoose").Document<unknown, {}, ResourceDocument, {}, import("mongoose").DefaultSchemaOptions> & Resource & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    } & {
+        id: string;
+    }>;
+    partialUpdate(id: string, body: {
+        title?: string;
+        description?: string;
+        category?: string;
+        type?: string;
+        fileUrl?: string;
+    }): Promise<import("mongoose").Document<unknown, {}, ResourceDocument, {}, import("mongoose").DefaultSchemaOptions> & Resource & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    } & {
+        id: string;
+    }>;
 }

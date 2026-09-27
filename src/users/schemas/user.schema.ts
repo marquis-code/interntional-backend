@@ -59,6 +59,12 @@ export class User {
   @Prop({ required: false })
   setupPasswordExpires: Date;
 
+  @Prop({ required: false })
+  resetPasswordToken: string;
+
+  @Prop({ required: false })
+  resetPasswordExpires: Date;
+
   @Prop({ required: true, enum: UserRole, default: UserRole.INTERN_MEMBER })
   role: UserRole;
 
@@ -108,6 +114,10 @@ export class User {
 
   @Prop({ type: Types.ObjectId, ref: 'Programme', required: false })
   programmeId: Types.ObjectId;
+
+  // -- Payment --
+  @Prop({ required: false })
+  paystackAuthCode: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

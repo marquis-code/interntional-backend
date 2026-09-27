@@ -5,20 +5,7 @@ export declare class SubscriptionsController {
     constructor(subscriptionsService: SubscriptionsService);
     findActive(): Promise<import("./subscription.schema").SubscriptionDocument[]>;
     findAll(query: PaginationParams): Promise<any>;
-    create(body: {
-        name: string;
-        description: string;
-        price: number;
-        durationMonths: number;
-        features: string[];
-    }): Promise<import("./subscription.schema").SubscriptionDocument>;
-    update(id: string, body: Partial<{
-        name: string;
-        description: string;
-        price: number;
-        durationMonths: number;
-        features: string[];
-        isActive: boolean;
-    }>): Promise<import("./subscription.schema").SubscriptionDocument>;
+    create(body: any): Promise<import("./subscription.schema").SubscriptionDocument>;
+    update(id: string, body: any): Promise<import("./subscription.schema").SubscriptionDocument>;
     delete(id: string): Promise<import("./subscription.schema").SubscriptionDocument>;
 }

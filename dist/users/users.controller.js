@@ -46,6 +46,9 @@ let UsersController = class UsersController {
     async getByDepartment(department) {
         return this.usersService.findByDepartment(department);
     }
+    async getById(id) {
+        return this.usersService.findByIdWithSubscription(id);
+    }
     async approve(id) {
         return this.usersService.approveUser(id);
     }
@@ -63,6 +66,9 @@ let UsersController = class UsersController {
     }
     async updatePermissions(id, permissions) {
         return this.usersService.updatePermissions(id, permissions);
+    }
+    async cancelSubscription(req) {
+        return this.usersService.cancelSubscription(req.user.userId);
     }
 };
 exports.UsersController = UsersController;
@@ -120,6 +126,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getByDepartment", null);
 __decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getById", null);
+__decorate([
     (0, decorators_1.Roles)(user_schema_1.UserRole.SUPER_ADMIN, user_schema_1.UserRole.ADMIN, user_schema_1.UserRole.MODERATOR),
     (0, common_1.Patch)(':id/approve'),
     __param(0, (0, common_1.Param)('id')),
@@ -170,6 +183,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Array]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updatePermissions", null);
+__decorate([
+    (0, common_1.Patch)('me/cancel-subscription'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "cancelSubscription", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),

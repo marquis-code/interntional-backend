@@ -59,6 +59,12 @@ export class UsersController {
     return this.usersService.findByDepartment(department);
   }
 
+  // GET /users/:id – get single user
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    return this.usersService.findByIdWithSubscription(id);
+  }
+
   // PATCH /users/:id/approve – approve a user and start their 24-month timer
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR)
   @Patch(':id/approve')
@@ -99,5 +105,11 @@ export class UsersController {
   @Patch(':id/permissions')
   async updatePermissions(@Param('id') id: string, @Body('permissions') permissions: string[]) {
     return this.usersService.updatePermissions(id, permissions);
+  }
+
+  // POST /users/me/cancel-subscription
+  @Patch('me/cancel-subscription')
+  async cancelSubscription(@Request() req: any) {
+    return this.usersService.cancelSubscription(req.user.userId);
   }
 }

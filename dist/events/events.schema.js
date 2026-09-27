@@ -72,6 +72,12 @@ let Event = class Event {
     speaker;
     status;
     registrationOpen;
+    price;
+    isMembersOnly;
+    tags;
+    agenda;
+    attachments;
+    sponsors;
 };
 exports.Event = Event;
 __decorate([
@@ -122,6 +128,30 @@ __decorate([
     (0, mongoose_1.Prop)({ default: true }),
     __metadata("design:type", Boolean)
 ], Event.prototype, "registrationOpen", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Event.prototype, "price", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Event.prototype, "isMembersOnly", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [String], default: [] }),
+    __metadata("design:type", Array)
+], Event.prototype, "tags", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ time: String, title: String, speaker: String }], default: [] }),
+    __metadata("design:type", Array)
+], Event.prototype, "agenda", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ name: String, url: String }], default: [] }),
+    __metadata("design:type", Array)
+], Event.prototype, "attachments", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ name: String, logo: String, website: String }], default: [] }),
+    __metadata("design:type", Array)
+], Event.prototype, "sponsors", void 0);
 exports.Event = Event = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Event);

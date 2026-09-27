@@ -17,6 +17,11 @@ let Subscription = class Subscription {
     price;
     durationMonths;
     features;
+    maxMentorshipRequests;
+    canAccessVault;
+    canPostArticles;
+    canAccessGlobalCommunity;
+    eventDiscountPercentage;
     isActive;
 };
 exports.Subscription = Subscription;
@@ -40,6 +45,26 @@ __decorate([
     (0, mongoose_1.Prop)({ type: [String], default: [] }),
     __metadata("design:type", Array)
 ], Subscription.prototype, "features", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Subscription.prototype, "maxMentorshipRequests", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Subscription.prototype, "canAccessVault", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Subscription.prototype, "canPostArticles", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Subscription.prototype, "canAccessGlobalCommunity", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Subscription.prototype, "eventDiscountPercentage", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: true }),
     __metadata("design:type", Boolean)

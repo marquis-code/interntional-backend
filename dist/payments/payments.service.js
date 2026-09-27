@@ -63,6 +63,7 @@ let PaymentsService = class PaymentsService {
                 amount: amountInKobo,
                 reference,
                 callback_url: callbackUrl,
+                channels: ['card'],
                 metadata: {
                     userId,
                     subscriptionId,
@@ -101,7 +102,8 @@ let PaymentsService = class PaymentsService {
             if (data.status === 'success') {
                 payment.status = payment_schema_1.PaymentStatus.SUCCESS;
                 await payment.save();
-                await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString());
+                const authCode = data.authorization?.authorization_code;
+                await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString(), authCode);
                 return { message: 'Payment verified successfully', payment, verified: true };
             }
             else {
@@ -128,15 +130,16 @@ let PaymentsService = class PaymentsService {
             payment.status = payment_schema_1.PaymentStatus.SUCCESS;
             payment.paystackResponse = eventData.data;
             await payment.save();
-            await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString());
+            const authCode = eventData.data?.authorization?.authorization_code;
+            await this.activateUserSubscription(payment.userId.toString(), payment.subscriptionId.toString(), authCode);
             return { message: 'Webhook processed successfully' };
         }
         return { message: 'Event type not handled' };
     }
-    async activateUserSubscription(userId, subscriptionId) {
+    async activateUserSubscription(userId, subscriptionId, authCode) {
         try {
             const plan = await this.subscriptionsService.findById(subscriptionId);
-            await this.usersService.activateSubscription(userId, plan.durationMonths);
+            await this.usersService.activateSubscription(userId, subscriptionId, plan.durationMonths, authCode);
         }
         catch (error) {
             console.error('Failed to activate subscription for user:', userId, error);

@@ -27,6 +27,7 @@ const universe_module_1 = require("./universe/universe.module");
 const events_module_1 = require("./events/events.module");
 const articles_module_1 = require("./articles/articles.module");
 const forms_module_1 = require("./forms/forms.module");
+const utils_module_1 = require("./utils/utils.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -56,6 +57,7 @@ exports.AppModule = AppModule = __decorate([
             events_module_1.EventsModule,
             articles_module_1.ArticlesModule,
             forms_module_1.FormsModule,
+            utils_module_1.UtilsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

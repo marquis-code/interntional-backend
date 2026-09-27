@@ -14,18 +14,26 @@ const payments_service_1 = require("./payments.service");
 const payment_schema_1 = require("./payment.schema");
 const subscriptions_module_1 = require("../subscriptions/subscriptions.module");
 const users_module_1 = require("../users/users.module");
+const utils_module_1 = require("../utils/utils.module");
+const payments_cron_1 = require("./payments.cron");
+const user_schema_1 = require("../users/schemas/user.schema");
 let PaymentsModule = class PaymentsModule {
 };
 exports.PaymentsModule = PaymentsModule;
 exports.PaymentsModule = PaymentsModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: payment_schema_1.Payment.name, schema: payment_schema_1.PaymentSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: payment_schema_1.Payment.name, schema: payment_schema_1.PaymentSchema },
+                { name: user_schema_1.User.name, schema: user_schema_1.UserSchema }
+            ]),
             subscriptions_module_1.SubscriptionsModule,
             users_module_1.UsersModule,
+            utils_module_1.UtilsModule,
         ],
         controllers: [payments_controller_1.PaymentsController],
-        providers: [payments_service_1.PaymentsService],
+        providers: [payments_service_1.PaymentsService, payments_cron_1.PaymentsCronService],
+        exports: [payments_service_1.PaymentsService],
     })
 ], PaymentsModule);
 //# sourceMappingURL=payments.module.js.map

@@ -42,6 +42,28 @@ export class UsersService {
     }, { new: true }).exec();
   }
 
+  async setResetPasswordToken(email: string, token: string, expires: Date): Promise<UserDocument | null> {
+    return this.userModel.findOneAndUpdate(
+      { email },
+      { $set: { resetPasswordToken: token, resetPasswordExpires: expires } },
+      { new: true }
+    ).exec();
+  }
+
+  async findByResetToken(token: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }
+    }).exec();
+  }
+
+  async resetPassword(id: string, passwordHash: string): Promise<UserDocument | null> {
+    return this.userModel.findByIdAndUpdate(id, {
+      $set: { passwordHash },
+      $unset: { resetPasswordToken: 1, resetPasswordExpires: 1 }
+    }, { new: true }).exec();
+  }
+
   async create(userDto: Partial<User>): Promise<UserDocument> {
     const newUser = new this.userModel(userDto);
     return newUser.save();
@@ -93,25 +115,33 @@ export class UsersService {
   }
 
   async approveUser(id: string): Promise<UserDocument | null> {
-    const setupToken = crypto.randomBytes(32).toString('hex');
-    const expires = new Date();
-    expires.setHours(expires.getHours() + 48); // 48 hours to set password
+    const userToApprove = await this.userModel.findById(id).exec();
+    if (!userToApprove) return null;
+
+    let updateData: any = {
+      status: UserStatus.APPROVED,
+      subscriptionStartDate: new Date(),
+    };
+
+    let setupToken: string | undefined;
+
+    if (!userToApprove.passwordHash) {
+      setupToken = crypto.randomBytes(32).toString('hex');
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 48); // 48 hours to set password
+      
+      updateData.setupPasswordToken = setupToken;
+      updateData.setupPasswordExpires = expires;
+    }
 
     const user = await this.userModel.findByIdAndUpdate(
       id,
-      {
-        $set: {
-          status: UserStatus.APPROVED,
-          subscriptionStartDate: new Date(),
-          setupPasswordToken: setupToken,
-          setupPasswordExpires: expires,
-        },
-      },
+      { $set: updateData },
       { new: true }
     ).exec();
 
     if (user) {
-      await this.emailService.sendAccountApprovedEmail(user.email, user.firstName, setupToken);
+      await this.emailService.sendAccountApprovedEmail(user.email, user.firstName, setupToken, user.role === UserRole.INTERN_MEMBER ? 'intern' : 'universe');
     }
     return user;
   }
@@ -167,18 +197,46 @@ export class UsersService {
     }).exec();
   }
 
-  async activateSubscription(userId: string, subscriptionId: string, durationMonths: number): Promise<UserDocument> {
+  async activateSubscription(userId: string, subscriptionId: string, durationMonths: number, authCode?: string): Promise<UserDocument> {
     const now = new Date();
     const endDate = new Date(now);
     endDate.setMonth(endDate.getMonth() + durationMonths);
 
+    const updateData: any = {
+      isSubscriptionActive: true,
+      activeSubscription: subscriptionId,
+      subscriptionStartDate: now,
+      subscriptionEndDate: endDate,
+    };
+    if (authCode) {
+      updateData.paystackAuthCode = authCode;
+    }
+
+    const user = await this.userModel.findByIdAndUpdate(userId, {
+      $set: updateData,
+    }, { new: true }).exec();
+
+    if (!user) throw new NotFoundException('User not found');
+
+    // Fetch plan details to send email
+    const SubscriptionModel = this.userModel.db.model('Subscription');
+    const plan = await SubscriptionModel.findById(subscriptionId).exec();
+    if (plan) {
+      const source = user.universityId ? 'universe' : 'intern';
+      await this.emailService.sendSubscriptionActivatedEmail(user.email, user.firstName, plan.name, source);
+    }
+
+    return user;
+  }
+
+  async cancelSubscription(userId: string): Promise<UserDocument> {
     const user = await this.userModel.findByIdAndUpdate(userId, {
       $set: {
-        isSubscriptionActive: true,
-        activeSubscription: subscriptionId,
-        subscriptionStartDate: now,
-        subscriptionEndDate: endDate,
+        isSubscriptionActive: false,
       },
+      $unset: {
+        paystackAuthCode: 1, // Remove auto-billing auth code so it doesn't charge again
+      }
     }, { new: true }).exec();
 
     if (!user) throw new NotFoundException('User not found');

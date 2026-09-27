@@ -1,9 +1,11 @@
 import { Model } from 'mongoose';
 import { Event, EventDocument, EventRegistration, EventRegistrationDocument } from './events.schema';
+import { UserDocument } from '../users/schemas/user.schema';
 export declare class EventsService {
     private eventModel;
     private registrationModel;
-    constructor(eventModel: Model<EventDocument>, registrationModel: Model<EventRegistrationDocument>);
+    private userModel;
+    constructor(eventModel: Model<EventDocument>, registrationModel: Model<EventRegistrationDocument>, userModel: Model<UserDocument>);
     getEvents(): Promise<(import("mongoose").Document<unknown, {}, EventDocument, {}, import("mongoose").DefaultSchemaOptions> & Event & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
