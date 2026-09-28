@@ -122,7 +122,5 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Add indexes for much faster lookups by status and role
 UserSchema.index({ status: 1, role: 1 });
-UserSchema.index({ email: 1 });
 UserSchema.index({ department: 1 });

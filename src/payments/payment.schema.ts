@@ -32,4 +32,3 @@ export class Payment {
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
 PaymentSchema.index({ userId: 1 });
-PaymentSchema.index({ reference: 1 });
