@@ -3,8 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { User, UserDocument, UserStatus, UserRole, Department, Permission } from './schemas/user.schema';
+import { Invitation, InvitationDocument } from './schemas/invitation.schema';
+import { CustomRole, CustomRoleDocument } from './schemas/custom-role.schema';
 import { paginateQuery, PaginationParams, PaginatedResult } from '../utils/pagination.util';
 import { EmailService } from '../utils/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -13,7 +16,10 @@ export class UsersService {
 
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Invitation.name) private invitationModel: Model<InvitationDocument>,
+    @InjectModel(CustomRole.name) private customRoleModel: Model<CustomRoleDocument>,
     private emailService: EmailService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async findByEmail(email: string): Promise<UserDocument | null> {
@@ -40,6 +46,67 @@ export class UsersService {
       $set: { passwordHash },
       $unset: { setupPasswordToken: 1, setupPasswordExpires: 1 }
     }, { new: true }).exec();
+  }
+
+  async createAdminInvitation(dto: { email: string, role: string, adminPlatform: string, department?: string, permissions: string[] }): Promise<InvitationDocument> {
+    const existingUser = await this.userModel.findOne({ email: dto.email }).exec();
+    if (existingUser) {
+      throw new BadRequestException('User with this email already exists.');
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+
+    const invite = new this.invitationModel({
+      email: dto.email,
+      role: dto.role,
+      adminPlatform: dto.adminPlatform,
+      permissions: dto.permissions,
+      token,
+      expiresAt,
+    });
+
+    await invite.save();
+
+    // In a real app, send an email here with the token link
+    const link = `http://localhost:3000/accept-invite?token=${token}`; // the frontend admin domain would be used
+    this.logger.log(`Generated Admin Invite Link: ${link}`);
+    
+    // We could use emailService if we add an invite email method:
+    // await this.emailService.sendAdminInviteEmail(dto.email, token);
+
+    return invite;
+  }
+
+  async createCustomRole(name: string, permissions: string[]): Promise<CustomRoleDocument> {
+    const existing = await this.customRoleModel.findOne({ name: name.toUpperCase() }).exec();
+    if (existing) {
+      existing.permissions = permissions;
+      return existing.save();
+    }
+    const role = new this.customRoleModel({ name, permissions });
+    return role.save();
+  }
+
+  async getCustomRoles(): Promise<CustomRoleDocument[]> {
+    return this.customRoleModel.find().exec();
+  }
+
+  async getAdminInvitations(): Promise<InvitationDocument[]> {
+    return this.invitationModel.find({ isUsed: false, expiresAt: { $gt: new Date() } }).exec();
+  }
+
+  async validateInvitation(token: string): Promise<InvitationDocument> {
+    const invite = await this.invitationModel.findOne({ token, isUsed: false, expiresAt: { $gt: new Date() } }).exec();
+    if (!invite) {
+      throw new BadRequestException('Invalid or expired invitation token.');
+    }
+    return invite;
+  }
+
+  async consumeInvitation(token: string): Promise<void> {
+    await this.invitationModel.updateOne({ token }, { $set: { isUsed: true } }).exec();
   }
 
   async setResetPasswordToken(email: string, token: string, expires: Date): Promise<UserDocument | null> {
@@ -142,6 +209,13 @@ export class UsersService {
 
     if (user) {
       await this.emailService.sendAccountApprovedEmail(user.email, user.firstName, setupToken, user.role === UserRole.INTERN_MEMBER ? 'intern' : 'universe');
+      await this.notificationsService.create({
+        userId: user._id.toString(),
+        title: 'Application Approved! 🎉',
+        message: 'Congratulations! Your verification has been approved. You now have full access to your ecosystem.',
+        type: 'APPROVAL',
+        link: '/dashboard/overview',
+      }).catch((err) => this.logger.error(`Notification error on approval: ${err.message}`));
     }
     return user;
   }
@@ -155,6 +229,12 @@ export class UsersService {
 
     if (user) {
       await this.emailService.sendAccountRejectedEmail(user.email, user.firstName);
+      await this.notificationsService.create({
+        userId: user._id.toString(),
+        title: 'Application Status Update',
+        message: 'Your verification documents were reviewed. Please contact support or update your application.',
+        type: 'APPROVAL',
+      }).catch((err) => this.logger.error(`Notification error on rejection: ${err.message}`));
     }
     return user;
   }

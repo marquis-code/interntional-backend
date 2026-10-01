@@ -118,6 +118,10 @@ export class User {
   // -- Payment --
   @Prop({ required: false })
   paystackAuthCode: string;
+
+  // -- Admin Platform Binding --
+  @Prop({ required: false, enum: ['universe', 'interntional', 'both'] })
+  adminPlatform?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,0 +1,66 @@
+import { Model } from 'mongoose';
+import { User, UserDocument, UserRole, Department } from './schemas/user.schema';
+import { InvitationDocument } from './schemas/invitation.schema';
+import { CustomRoleDocument } from './schemas/custom-role.schema';
+import { PaginationParams, PaginatedResult } from '../utils/pagination.util';
+import { EmailService } from '../utils/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
+export declare class UsersService {
+    private userModel;
+    private invitationModel;
+    private customRoleModel;
+    private emailService;
+    private notificationsService;
+    private readonly logger;
+    constructor(userModel: Model<UserDocument>, invitationModel: Model<InvitationDocument>, customRoleModel: Model<CustomRoleDocument>, emailService: EmailService, notificationsService: NotificationsService);
+    findByEmail(email: string): Promise<UserDocument | null>;
+    findById(id: string): Promise<UserDocument | null>;
+    findByIdWithSubscription(id: string): Promise<UserDocument | null>;
+    findBySetupToken(token: string): Promise<UserDocument | null>;
+    updatePasswordAndActivate(id: string, passwordHash: string): Promise<UserDocument | null>;
+    createAdminInvitation(dto: {
+        email: string;
+        role: string;
+        adminPlatform: string;
+        department?: string;
+        permissions: string[];
+    }): Promise<InvitationDocument>;
+    createCustomRole(name: string, permissions: string[]): Promise<CustomRoleDocument>;
+    getCustomRoles(): Promise<CustomRoleDocument[]>;
+    getAdminInvitations(): Promise<InvitationDocument[]>;
+    validateInvitation(token: string): Promise<InvitationDocument>;
+    consumeInvitation(token: string): Promise<void>;
+    setResetPasswordToken(email: string, token: string, expires: Date): Promise<UserDocument | null>;
+    findByResetToken(token: string): Promise<UserDocument | null>;
+    resetPassword(id: string, passwordHash: string): Promise<UserDocument | null>;
+    create(userDto: Partial<User>): Promise<UserDocument>;
+    getUserDashboardStats(userId: string): Promise<{
+        documentsUploaded: number;
+        mentorshipSessions: number;
+        jobsApplied: number;
+    }>;
+    findPendingUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
+    findApprovedUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
+    findAllUsers(params?: PaginationParams): Promise<PaginatedResult<any>>;
+    findMentors(params?: PaginationParams): Promise<PaginatedResult<any>>;
+    findByDepartment(department: string): Promise<any[]>;
+    approveUser(id: string): Promise<UserDocument | null>;
+    rejectUser(id: string): Promise<UserDocument | null>;
+    updateRole(id: string, role: UserRole): Promise<UserDocument>;
+    updateDepartment(id: string, department: Department): Promise<UserDocument>;
+    updatePermissions(id: string, permissions: string[]): Promise<UserDocument>;
+    trackLogin(id: string): Promise<void>;
+    activateSubscription(userId: string, subscriptionId: string, durationMonths: number, authCode?: string): Promise<UserDocument>;
+    cancelSubscription(userId: string): Promise<UserDocument>;
+    getStats(): Promise<{
+        totalUsers: number;
+        pendingUsers: number;
+        approvedUsers: number;
+        rejectedUsers: number;
+        activeSubscriptions: number;
+        recentSignups: number;
+        roleBreakdown: any;
+        departmentBreakdown: any;
+    }>;
+    handleSubscriptionCaps(): Promise<void>;
+}

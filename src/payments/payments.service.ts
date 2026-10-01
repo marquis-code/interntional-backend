@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Payment, PaymentDocument, PaymentStatus } from './payment.schema';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { UsersService } from '../users/users.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { paginateQuery, PaginationParams } from '../utils/pagination.util';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class PaymentsService {
     private configService: ConfigService,
     private subscriptionsService: SubscriptionsService,
     private usersService: UsersService,
+    private notificationsService: NotificationsService,
   ) {
     this.secretKey = this.configService.get<string>('PAYSTACK_SECRET_KEY') || '';
   }
@@ -52,6 +54,20 @@ export class PaymentsService {
     });
     await payment.save();
 
+    // Auto-activate free plans without routing through Paystack
+    if (amountInKobo <= 0) {
+      payment.status = PaymentStatus.SUCCESS;
+      payment.paystackResponse = { channel: 'free_tier', activatedAt: new Date() };
+      await payment.save();
+      await this.activateUserSubscription(userId, subscriptionId);
+      return {
+        authorization_url: null,
+        isFree: true,
+        reference,
+        message: 'Free subscription activated successfully',
+      };
+    }
+
     // Initialize with Paystack
     try {
       const response = await axios.post(
@@ -61,7 +77,7 @@ export class PaymentsService {
           amount: amountInKobo, // Amount in kobo
           reference,
           callback_url: callbackUrl,
-          channels: ['card'],
+          channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
           metadata: {
             userId,
             subscriptionId,
@@ -169,6 +185,13 @@ export class PaymentsService {
     try {
       const plan = await this.subscriptionsService.findById(subscriptionId);
       await this.usersService.activateSubscription(userId, subscriptionId, plan.durationMonths, authCode);
+      await this.notificationsService.create({
+        userId,
+        title: 'Plan Activated! 💳',
+        message: `Your subscription to "${plan?.name || 'Membership'}" is now active! Enjoy your new access and perks.`,
+        type: 'SUBSCRIPTION',
+        link: '/dashboard/pricing',
+      }).catch((err) => console.error('Notification error on subscription activation:', err));
     } catch (error) {
       // Log but don't throw — payment was already successful
       console.error('Failed to activate subscription for user:', userId, error);

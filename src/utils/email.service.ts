@@ -135,6 +135,50 @@ export class EmailService {
     }
   }
 
+  // --- MENTORSHIP EMAILS ---
+
+  async sendMentorshipMatchedEmailToMentee(email: string, firstName: string, mentorName: string, mentorEmail: string, source: 'intern' | 'universe' = 'intern') {
+    const title = 'Great News! You Have Been Matched with a Mentor 🎉';
+    const bodyContent = `
+      <h2 style="color: #1f2937; margin-bottom: 20px;">Hello ${firstName},</h2>
+      <p style="margin-bottom: 15px;">We are thrilled to let you know that you have been successfully matched with a mentor!</p>
+      <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <p style="margin: 0 0 10px 0;"><strong>Mentor Name:</strong> ${mentorName}</p>
+        <p style="margin: 0;"><strong>Mentor Email:</strong> <a href="mailto:${mentorEmail}" style="color: #27628C;">${mentorEmail}</a></p>
+      </div>
+      <p style="margin-bottom: 15px;">Please feel free to reach out to them via email to introduce yourself and kick off your mentorship journey.</p>
+      <p style="margin-bottom: 15px;">We wish you the best of luck with your collaborations!</p>
+    `;
+    const html = buildEmailTemplate(title, bodyContent, source);
+    try {
+      await this.resend.emails.send({ from: this.fromEmail, to: email, subject: title, html });
+      this.logger.log(`Mentorship match email sent to mentee ${email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send mentorship email to mentee ${email}`, error);
+    }
+  }
+
+  async sendMentorshipMatchedEmailToMentor(email: string, mentorName: string, menteeName: string, menteeEmail: string, areaOfInterest: string, source: 'intern' | 'universe' = 'intern') {
+    const title = 'You Have a New Mentee! 🎉';
+    const bodyContent = `
+      <h2 style="color: #1f2937; margin-bottom: 20px;">Hello ${mentorName},</h2>
+      <p style="margin-bottom: 15px;">Thank you for your dedication to guiding the next generation. We have successfully matched you with a new mentee who is eager to learn from your expertise in <strong>${areaOfInterest}</strong>!</p>
+      <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <p style="margin: 0 0 10px 0;"><strong>Mentee Name:</strong> ${menteeName}</p>
+        <p style="margin: 0;"><strong>Mentee Email:</strong> <a href="mailto:${menteeEmail}" style="color: #27628C;">${menteeEmail}</a></p>
+      </div>
+      <p style="margin-bottom: 15px;">Your mentee has been provided with your contact details as well. You can expect them to reach out soon, or feel free to send them a welcoming email.</p>
+      <p style="margin-bottom: 15px;">Thank you for your invaluable contribution to the community!</p>
+    `;
+    const html = buildEmailTemplate(title, bodyContent, source);
+    try {
+      await this.resend.emails.send({ from: this.fromEmail, to: email, subject: title, html });
+      this.logger.log(`Mentorship match email sent to mentor ${email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send mentorship email to mentor ${email}`, error);
+    }
+  }
+
   // --- NEW SUBSCRIPTION EMAILS ---
 
   async sendSubscriptionActivatedEmail(email: string, firstName: string, planName: string, source: 'intern' | 'universe' = 'intern') {
@@ -267,6 +311,35 @@ export class EmailService {
     }
   }
 
+  async sendLoginOtpEmail(email: string, firstName: string, otp: string, source: 'intern' | 'universe' = 'intern') {
+    const brandName = source === 'universe' ? 'UniVerse' : 'InternTional';
+    const primaryColor = source === 'universe' ? '#27628C' : '#27628C';
+    const title = `${brandName} Login Verification Code`;
+    const bodyContent = `
+      <h2 style="color: #1f2937; margin-bottom: 20px;">Hello ${firstName || 'Member'},</h2>
+      <p style="margin-bottom: 15px;">Someone (hopefully you) just attempted to sign in to your ${brandName} account. Use the 6-digit verification code below to complete your login.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <span style="font-size: 36px; font-weight: 900; letter-spacing: 8px; color: #1f2937; background-color: #f0f9ff; border: 2px solid ${primaryColor}; padding: 14px 28px; border-radius: 10px; display: inline-block;">${otp}</span>
+      </div>
+      <p style="margin-top: 20px; color: #6b7280;">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</p>
+      <p style="margin-top: 10px; color: #ef4444;">If you did not attempt to sign in, please secure your account immediately.</p>
+    `;
+    const html = buildEmailTemplate(title, bodyContent, source);
+    try {
+      await this.resend.emails.send({
+        from: this.fromEmail,
+        to: email,
+        subject: `Your ${brandName} verification code is ${otp}`,
+        html,
+      });
+      this.logger.log(`[AUTH OTP] Login verification code sent to ${email}: ${otp}`);
+    } catch (error) {
+      this.logger.error(`Failed to send login OTP to ${email}`, error);
+      // Fallback logging so development/testing is never blocked by Resend failures
+      this.logger.log(`[AUTH OTP FALLBACK] Verification code for ${email}: ${otp}`);
+    }
+  }
+
   async sendAdminPasswordResetEmail(email: string, firstName: string, token: string) {
     const resetUrl = `https://admin.medlabconvo.com/reset-password?token=${token}`;
     const title = 'Admin Password Reset Request';
@@ -291,6 +364,31 @@ export class EmailService {
       this.logger.log(`Admin password reset email sent to ${email}`);
     } catch (error) {
       this.logger.error(`Failed to send admin password reset email to ${email}`, error);
+    }
+  }
+
+  async sendStatusUpdateEmail(email: string, firstName: string, formTitle: string, statusFormatted: string, source: 'intern' | 'universe' = 'intern') {
+    const title = `Status Update: ${formTitle}`;
+    const bodyContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+        <h2 style="color: #02508b;">Submission Status Update</h2>
+        <p style="margin-bottom: 15px;">Hello ${firstName},</p>
+        <p style="margin-bottom: 15px;">Your submission for <strong>${formTitle}</strong> has been updated.</p>
+        <p style="margin-bottom: 15px;">New Status: <strong style="color: #02508b;">${statusFormatted}</strong></p>
+        <p style="margin-top: 25px;">Thank you.</p>
+      </div>
+    `;
+    const html = buildEmailTemplate(title, bodyContent, source);
+    try {
+      await this.resend.emails.send({
+        from: this.fromEmail,
+        to: email,
+        subject: title,
+        html,
+      });
+      this.logger.log(`Status update email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send status update email to ${email}`, error);
     }
   }
 }

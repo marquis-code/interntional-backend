@@ -11,6 +11,9 @@ export class Subscription {
   @Prop({ default: '' })
   description: string;
 
+  @Prop({ default: '' })
+  bannerImage: string; // Optional banner image
+
   @Prop({ required: true })
   price: number; // Price in kobo (Paystack uses kobo for NGN)
 
@@ -33,11 +36,44 @@ export class Subscription {
   @Prop({ default: false })
   canAccessGlobalCommunity: boolean;
 
+  @Prop({ default: false })
+  canAccessPremiumJobs: boolean;
+
+  @Prop({ default: false })
+  canMessageMentorsDirectly: boolean;
+
+  @Prop({ default: false })
+  resumeReviewIncluded: boolean;
+
+  @Prop({ default: false })
+  mockInterviewsIncluded: boolean;
+
+  @Prop({ default: false })
+  canAccessPremiumResources: boolean;
+
   @Prop({ default: 0 })
   eventDiscountPercentage: number;
 
   @Prop({ default: true })
   isActive: boolean;
+
+  // Redesigned Selar Courses Section
+  @Prop({ 
+    type: [{ 
+      category: String, 
+      courses: [{ 
+        title: String, 
+        link: String, 
+        description: String, 
+        image: String 
+      }] 
+    }], 
+    default: [] 
+  })
+  sellarCourses: { 
+    category: string; 
+    courses: { title: string; link: string; description?: string; image?: string }[] 
+  }[];
 }
 
 export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);

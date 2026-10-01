@@ -19,6 +19,13 @@ import { EventsModule } from './events/events.module';
 import { ArticlesModule } from './articles/articles.module';
 import { FormsModule } from './forms/forms.module';
 import { UtilsModule } from './utils/utils.module';
+import { MentorshipModule } from './mentorship/mentorship.module';
+import { NotificationsModule } from './notifications/notifications.module';
+
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionsGuard } from './auth/permissions.guard';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { BountiesModule } from './bounties/bounties.module';
 
 @Module({
   imports: [
@@ -46,8 +53,18 @@ import { UtilsModule } from './utils/utils.module';
     ArticlesModule,
     FormsModule,
     UtilsModule,
+    MentorshipModule,
+    NotificationsModule,
+    MarketplaceModule,
+    BountiesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -22,6 +22,12 @@ export class Resource {
 
   @Prop({ required: true })
   uploadedBy: string; // Admin User ID
+
+  @Prop({ default: 0 })
+  price: number; // in Kobo, 0 means free
+
+  @Prop({ default: false })
+  isPremium: boolean;
 }
 
 export const ResourceSchema = SchemaFactory.createForClass(Resource);

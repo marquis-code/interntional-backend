@@ -19,6 +19,9 @@ export class Job {
 
   @Prop({ required: true })
   link: string; // URL to apply
+
+  @Prop({ default: 'open', enum: ['draft', 'open', 'closed'] })
+  status: string;
 }
 
 export const JobSchema = SchemaFactory.createForClass(Job);

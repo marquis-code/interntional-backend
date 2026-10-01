@@ -2,12 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Form, FormDocument, FormSubmission, FormSubmissionDocument } from './forms.schema';
+import { EmailService } from '../utils/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class FormsService {
   constructor(
     @InjectModel(Form.name) private formModel: Model<FormDocument>,
     @InjectModel(FormSubmission.name) private submissionModel: Model<FormSubmissionDocument>,
+    private emailService: EmailService,
+    private notificationsService: NotificationsService,
+    private usersService: UsersService,
   ) {}
 
   // ---- Forms CRUD ----
@@ -60,7 +66,34 @@ export class FormsService {
   }
 
   async updateSubmission(id: string, data: any) {
-    return this.submissionModel.findByIdAndUpdate(id, data, { new: true }).exec();
+    const updated = await this.submissionModel.findByIdAndUpdate(id, data, { new: true }).exec();
+    if (updated && data.status) {
+      const form = await this.formModel.findById(updated.formId).exec();
+      const formTitle = form ? form.title : 'Form';
+      const statusFormatted = data.status.charAt(0).toUpperCase() + data.status.slice(1).replace('-', ' ');
+      
+      if (updated.submitterEmail) {
+        this.emailService.sendStatusUpdateEmail(
+          updated.submitterEmail,
+          updated.submitterName || 'there',
+          formTitle,
+          statusFormatted
+        ).catch(err => console.error('Failed to send status update email:', err));
+      }
+
+      if (updated.submitterEmail) {
+        const user = await this.usersService.findByEmail(updated.submitterEmail);
+        if (user) {
+          this.notificationsService.create({
+            userId: user._id,
+            title: `Submission Updated`,
+            message: `Your submission for "${formTitle}" has been marked as ${statusFormatted}.`,
+            type: 'system',
+          }).catch(err => console.error('Failed to create notification:', err));
+        }
+      }
+    }
+    return updated;
   }
 
   async deleteSubmission(id: string) {

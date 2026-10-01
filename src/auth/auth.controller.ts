@@ -17,6 +17,16 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Post('login/verify-otp')
+  async verifyLoginOtp(@Body() body: { email: string; otp: string }) {
+    return this.authService.verifyLoginOtp(body.email, body.otp);
+  }
+
+  @Post('login/resend-otp')
+  async resendLoginOtp(@Body() body: { email: string; source?: string }) {
+    return this.authService.resendLoginOtp(body.email, body.source as any);
+  }
+
   @Post('setup-password')
   async setupPassword(@Body() setupDto: SetupPasswordDto) {
     return this.authService.setupPassword(setupDto);
@@ -72,6 +82,11 @@ export class AuthController {
   @Post('admin/reset-password')
   async adminResetPassword(@Body() body: { token: string; password: string }) {
     return this.authService.adminResetPassword(body.token, body.password);
+  }
+
+  @Post('admin/accept-invite')
+  async acceptAdminInvite(@Body() body: { token: string; firstName: string; lastName: string; password: string }) {
+    return this.authService.acceptAdminInvite(body.token, body);
   }
 
   @UseGuards(AuthGuard('jwt'))

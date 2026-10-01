@@ -16,6 +16,7 @@ export class RegisterDto {
 export class LoginDto {
   email: string;
   password: string;
+  source?: 'intern' | 'universe';
 }
 
 export class SetupPasswordDto {

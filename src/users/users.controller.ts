@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Body, UseGuards, UseInterceptors, Query, Request } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, UseGuards, UseInterceptors, Query, Request, Post, BadRequestException } from '@nestjs/common';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
@@ -12,9 +12,34 @@ import type { PaginationParams } from '../utils/pagination.util';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @Post('invitations')
+  async createInvitation(@Body() dto: { email: string, role: string, adminPlatform: string, department?: string, permissions: string[] }) {
+    return this.usersService.createAdminInvitation(dto);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @Get('invitations')
+  async getInvitations() {
+    return this.usersService.getAdminInvitations();
+  }
+
   @Get('me/dashboard-stats')
   async getMyDashboardStats(@Request() req: any) {
     return this.usersService.getUserDashboardStats(req.user.userId);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @Post('roles')
+  async createCustomRole(@Body() dto: { name: string, permissions: string[] }) {
+    if (!dto.name) throw new BadRequestException('Role name is required');
+    return this.usersService.createCustomRole(dto.name, dto.permissions || []);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @Get('roles')
+  async getCustomRoles() {
+    return this.usersService.getCustomRoles();
   }
 
   // GET /users/pending – list pending users (for admin dashboard)
