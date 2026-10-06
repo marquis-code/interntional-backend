@@ -46,6 +46,14 @@ async function run() {
       lastName: 'SuperAdmin',
       role: 'SUPER_ADMIN',
       adminPlatform: 'both',
+    },
+    {
+      email: 'oluwamuyiwa@medlabconvo.com',
+      password: 'Oluwamuyiwa@MLS2026!',
+      firstName: 'Oluwamuyiwa',
+      lastName: 'SuperAdmin',
+      role: 'SUPER_ADMIN',
+      adminPlatform: 'both',
     }
   ];
 

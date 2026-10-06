@@ -249,6 +249,7 @@ export class AuthService {
     'interntional@medlabconvo.com',
     'universe@medlabconvo.com',
     'marquis@medlabconvo.com',
+    'oluwamuyiwa@medlabconvo.com',
     'test_moderator@medlabconvo.com'
   ];
 

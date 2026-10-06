@@ -24,6 +24,12 @@ const ADMIN_USERS = [
     email: 'marquis@medlabconvo.com',
     tempPassword: 'Marquis@MLS2026!',
   },
+  {
+    firstName: 'Oluwamuyiwa',
+    lastName: 'Admin',
+    email: 'oluwamuyiwa@medlabconvo.com',
+    tempPassword: 'Oluwamuyiwa@MLS2026!',
+  },
 ];
 
 async function bootstrap() {
