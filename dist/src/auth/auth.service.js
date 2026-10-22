@@ -245,17 +245,29 @@ let AuthService = class AuthService {
         'interntional@medlabconvo.com',
         'universe@medlabconvo.com',
         'marquis@medlabconvo.com',
-        'test_moderator@medlabconvo.com'
+        'oluwamuyiwa@medlabconvo.com',
+        'test_moderator@medlabconvo.com',
+        'zekerisuleiman6@gmail.com',
+        'andyetinosa05@gmail.com',
+        'oge.ibe55@gmail.com',
+        'folamide334@gmail.com',
+        'miracle@medlabconvo.com',
+        'oyindamola@medlabconvo.com',
+        'ezeagumichael290307@gmail.com',
+        'gospelaiuagelemon@gmail.com',
+        'ojekaraphael6@gmail.com',
     ];
     ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'DEPARTMENT_HEAD'];
     async adminLoginStep1(email, password) {
         const normalizedEmail = email.toLowerCase().trim();
-        if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
-            throw new common_1.UnauthorizedException('Access denied. This email is not authorised for admin access.');
-        }
         const user = await this.usersService.findByEmail(normalizedEmail);
         if (!user || !user.passwordHash) {
             throw new common_1.UnauthorizedException('Invalid credentials.');
+        }
+        const isAuthorized = this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail) ||
+            this.ADMIN_ROLES.includes(user.role);
+        if (!isAuthorized) {
+            throw new common_1.UnauthorizedException('Access denied. This email is not authorised for admin access.');
         }
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
@@ -309,12 +321,14 @@ let AuthService = class AuthService {
     }
     async adminResendOtp(email) {
         const normalizedEmail = email.toLowerCase().trim();
-        if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
-            throw new common_1.UnauthorizedException('Access denied.');
-        }
         const user = await this.usersService.findByEmail(normalizedEmail);
         if (!user) {
             throw new common_1.UnauthorizedException('User not found.');
+        }
+        const isAuthorized = this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail) ||
+            this.ADMIN_ROLES.includes(user.role);
+        if (!isAuthorized) {
+            throw new common_1.UnauthorizedException('Access denied.');
         }
         if (!this.ADMIN_ROLES.includes(user.role)) {
             throw new common_1.UnauthorizedException('Access denied. Insufficient privileges.');
@@ -326,11 +340,10 @@ let AuthService = class AuthService {
     }
     async adminForgotPassword(email) {
         const normalizedEmail = email.toLowerCase().trim();
-        if (!this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
-            return { message: 'If that email exists, a reset link has been sent.' };
-        }
         const user = await this.usersService.findByEmail(normalizedEmail);
-        if (!user) {
+        const isAuthorized = this.ALLOWED_ADMIN_EMAILS.includes(normalizedEmail) ||
+            (user && this.ADMIN_ROLES.includes(user.role));
+        if (!isAuthorized || !user) {
             return { message: 'If that email exists, a reset link has been sent.' };
         }
         const token = require('crypto').randomBytes(32).toString('hex');
