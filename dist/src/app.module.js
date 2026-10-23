@@ -34,6 +34,7 @@ const core_1 = require("@nestjs/core");
 const permissions_guard_1 = require("./auth/permissions.guard");
 const marketplace_module_1 = require("./marketplace/marketplace.module");
 const bounties_module_1 = require("./bounties/bounties.module");
+const site_settings_module_1 = require("./site-settings/site-settings.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -68,6 +69,7 @@ exports.AppModule = AppModule = __decorate([
             notifications_module_1.NotificationsModule,
             marketplace_module_1.MarketplaceModule,
             bounties_module_1.BountiesModule,
+            site_settings_module_1.SiteSettingsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

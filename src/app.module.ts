@@ -26,6 +26,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from './auth/permissions.guard';
 import { MarketplaceModule } from './marketplace/marketplace.module';
 import { BountiesModule } from './bounties/bounties.module';
+import { SiteSettingsModule } from './site-settings/site-settings.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { BountiesModule } from './bounties/bounties.module';
     NotificationsModule,
     MarketplaceModule,
     BountiesModule,
+    SiteSettingsModule,
   ],
   controllers: [AppController],
   providers: [
